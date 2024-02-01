@@ -97,6 +97,7 @@ const Authentication = {
     },
     /** @type {boolean} */
     setupContracts: async function () {
+        return;
         // this.zkClient.loadContract()
         // .then(this.zkClient.compileContract())
         // .then(() => {

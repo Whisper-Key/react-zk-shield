@@ -1,14 +1,6 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import Link from 'next/link'
-import Header from '../layout/Header'
-import Footer from '../layout/Footer'
-import Authentication from '../../modules/Authentication';
-import Router from 'next/router';
+
+import Authentication from './Authentication';
 import { useEffect, useState, createContext } from "react";
-import Snackbar from '../../modules/Snackbar'
-import AllMaWorkerEventsClient from '../../modules/workers/AllMaWorkerEventsClient'
-import CredentialsWorkerClient from '../../modules/workers/CredentialsWorkerClient'
 
 import {
   PublicKey,
@@ -17,7 +9,7 @@ import {
 } from 'o1js'
 
 const AuthContext = createContext();
-const AuthPage = ({ validate, children }) => {
+const ZkShield = ({ validate, children }) => {
   // load from Authentication values
   //Authentication.getNum();
   let [state, setState] = useState({
@@ -67,10 +59,10 @@ const AuthPage = ({ validate, children }) => {
       if (!Authentication.loggedIn) {
         if (!state.hasBeenSetup) {
           console.log("setting up");
-          const allWorkerClient = new CredentialsWorkerClient();
+          //const allWorkerClient = new CredentialsWorkerClient();
           //const allWorkerClient = new AllMaWorkerClient();
           //const zkappWorkerClient = new RankedBjjWorkerClient();
-          Authentication.setZkClient(allWorkerClient);
+         // Authentication.setZkClient(allWorkerClient);
           await timeout(15);
           console.log("loading snarky");
           try {
@@ -116,7 +108,7 @@ const AuthPage = ({ validate, children }) => {
 
             
             console.log('fetching account');
-            Authentication.zkClient.fetchAccount({ publicKey: PublicKey.fromBase58(Authentication.contractAddress) });
+            Authentication.zkClient?.fetchAccount({ publicKey: PublicKey.fromBase58(Authentication.contractAddress) });
             console.log('fetching account done');
             setFirstFetchAccount(true);
 
@@ -229,4 +221,4 @@ const AuthPage = ({ validate, children }) => {
 
 }
 
-export { AuthContext, AuthPage };
+export { AuthContext, ZkShield };

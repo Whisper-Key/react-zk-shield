@@ -21,6 +21,7 @@
         "noEmit": true,
         "incremental": true,
         "resolveJsonModule": true,
+        "noImplicitAny": false,
         "jsx": "preserve",
         "paths": {
           "@/*": ["./src/*"]
