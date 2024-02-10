@@ -10,24 +10,22 @@ import {
 
 const AuthContext = createContext();
 const ZkShield = ({ validate, children }) => {
-  // load from Authentication values
-  //Authentication.getNum();
+  const network = new NetworkWorkerClient();
+  const authentication = new Authentication(window.mina, NetworkWorkerClient);
   let [state, setState] = useState({
-    authentication: null,
-    hasWallet: Authentication.hasWallet,
-    hasBeenSetup: validate ? Authentication.hasBeenSetup : true,
-    accountExists: Authentication.accountExists,
+    hasWallet: authentication.hasWallet,
+    hasBeenSetup: validate ? authentication.hasBeenSetup : true,
+    accountExists: authentication.accountExists,
     currentNum: null,
     publicKey: null,
     zkappPublicKey: null,
     creatingTransaction: false,
-    snarkyLoaded: Authentication.sn,
+    o1jsLoaded: authentication.o1jsLoaded,
     showRequestingAccount: false,
     showCreateWallet: false,
     showFundAccount: false,
     showLoadingContracts: false,
     userAddress: null,
-    authentication: null,
   });
 
   let [authState, setAuthState] = useState({
@@ -56,33 +54,28 @@ const ZkShield = ({ validate, children }) => {
 
 
     (async () => {
-      if (!Authentication.loggedIn) {
+      if (!authentication.loggedIn) {
         if (!state.hasBeenSetup) {
-          console.log("setting up");
-          //const allWorkerClient = new CredentialsWorkerClient();
-          //const allWorkerClient = new AllMaWorkerClient();
-          //const zkappWorkerClient = new RankedBjjWorkerClient();
-         // Authentication.setZkClient(allWorkerClient);
           await timeout(15);
           console.log("loading snarky");
           try {
-            const loadedSnarky = await Authentication.loadSnarky();
+            const loadedSnarky = await authentication.loadSnarky();
           } catch (e) {
             console.log("error loading snarky", e);
           }
 
           console.log("loadedSnarky");
-          const hasWallet = await Authentication.checkForWallet();
+          const hasWallet = await authentication.checkForWallet();
           if (!hasWallet) {
-            setState({ ...state, hasWallet: false, snarkyLoaded: true });
+            setState({ ...state, hasWallet: false, o1jsLoaded: true });
             return;
           }
           else {
-            setState({ ...state, hasWallet: true, snarkyLoaded: true, showRequestingAccount: true });
+            setState({ ...state, hasWallet: true, o1jsLoaded: true, showRequestingAccount: true });
             console.log("has wallet");
           }
           console.log("requesting account");
-          const loginResult = await Authentication.login();
+          const loginResult = await authentication.login();
           console.log("login result", loginResult);
 
           if (loginResult.error == "user reject") {
@@ -90,31 +83,31 @@ const ZkShield = ({ validate, children }) => {
           }
           else if (loginResult.error == "please create or restore wallet first") {
             console.log("please create or restore wallet first");
-            setState({ ...state, showCreateWallet: true, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
+            setState({ ...state, showCreateWallet: true, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false });
           }
 
           console.log("checking account");
-          const accountExists = await Authentication.doesAccountExist();
+          const accountExists = await authentication.doesAccountExist();
           if (!accountExists) {
-            setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
+            setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false });
           }
           else {
-            setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: true });
-            const hasBeenSetup = await Authentication.setupContracts();
+            setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false, userAddress: true });
+            const hasBeenSetup = await authentication.setupContracts();
             setUserAuthenticated(true);
-            setUserAddress(Authentication.address);
-            //const hasBeenSetup = Authentication.setupBjjPromoteContracts();
-            setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: Authentication.address, authentication: Authentication });
+            setUserAddress(authentication.address);
+            //const hasBeenSetup = authentication.setupBjjPromoteContracts();
+            setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication });
 
             
             console.log('fetching account');
-            Authentication.zkClient?.fetchAccount({ publicKey: PublicKey.fromBase58(Authentication.contractAddress) });
+            authentication.zkClient?.fetchAccount({ publicKey: PublicKey.fromBase58(authentication.contractAddress) });
             console.log('fetching account done');
             setFirstFetchAccount(true);
 
-            setAuthState({ ...authState, userAuthenticated: true, userAddress: Authentication.address, firstFetchAccount: true, alertAvailable:true, alertMessage: 'Successfully logged in' });
+            setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address, firstFetchAccount: true, alertAvailable:true, alertMessage: 'Successfully logged in' });
             // console.log('fetching storage root');
-            // let root = await Authentication.zkClient.getNum();
+            // let root = await authentication.zkClient.getNum();
             // console.log("storage root", root.toString());
           }
 
@@ -127,7 +120,7 @@ const ZkShield = ({ validate, children }) => {
 
   const loginClicked = async () => {
     try {
-      const loggedIn = await Authentication.login();
+      const loggedIn = await authentication.login();
       if (loggedIn) {
         Router.push('/dashboard');
       }
@@ -138,8 +131,8 @@ const ZkShield = ({ validate, children }) => {
         Snackbar("You cancelled connection with Mina wallet!", 1500);
       }
     }
-    // const loggedIn = Authentication.login();
-    // if (Authentication.loggedIn) {
+    // const loggedIn = authentication.login();
+    // if (authentication.loggedIn) {
     //   Router.push('/dashboard')
     // }
   }
@@ -162,8 +155,8 @@ const ZkShield = ({ validate, children }) => {
                   <div className="max-w-md">
                     <h1 className="text-5xl font-bold">Getting things ready</h1>
                     <div className='pt-20'>
-                      <div className={`${!state.snarkyLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''}`} data-reveal-delay="400">
-                        <div style={{ display: state.snarkyLoaded ? "none" : "block" }}>
+                      <div className={`${!state.o1jsLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''}`} data-reveal-delay="400">
+                        <div style={{ display: state.o1jsLoaded ? "none" : "block" }}>
                           Loading <span className="text-color-primary">o1js</span>...
                         </div>
                         {state.hasWallet != null && !state.hasWallet &&

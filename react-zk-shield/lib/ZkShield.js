@@ -14,24 +14,22 @@ const ZkShield = _ref => {
     validate,
     children
   } = _ref;
-  // load from Authentication values
-  //Authentication.getNum();
+  const network = new NetworkWorkerClient();
+  const authentication = new _Authentication.default(window.mina, NetworkWorkerClient);
   let [state, setState] = (0, _react.useState)({
-    authentication: null,
-    hasWallet: _Authentication.default.hasWallet,
-    hasBeenSetup: validate ? _Authentication.default.hasBeenSetup : true,
-    accountExists: _Authentication.default.accountExists,
+    hasWallet: authentication.hasWallet,
+    hasBeenSetup: validate ? authentication.hasBeenSetup : true,
+    accountExists: authentication.accountExists,
     currentNum: null,
     publicKey: null,
     zkappPublicKey: null,
     creatingTransaction: false,
-    snarkyLoaded: _Authentication.default.sn,
+    o1jsLoaded: authentication.o1jsLoaded,
     showRequestingAccount: false,
     showCreateWallet: false,
     showFundAccount: false,
     showLoadingContracts: false,
-    userAddress: null,
-    authentication: null
+    userAddress: null
   });
   let [authState, setAuthState] = (0, _react.useState)({
     userAuthenticated: false,
@@ -54,40 +52,35 @@ const ZkShield = _ref => {
       });
     }
     (async () => {
-      if (!_Authentication.default.loggedIn) {
+      if (!authentication.loggedIn) {
         if (!state.hasBeenSetup) {
-          console.log("setting up");
-          //const allWorkerClient = new CredentialsWorkerClient();
-          //const allWorkerClient = new AllMaWorkerClient();
-          //const zkappWorkerClient = new RankedBjjWorkerClient();
-          // Authentication.setZkClient(allWorkerClient);
           await timeout(15);
           console.log("loading snarky");
           try {
-            const loadedSnarky = await _Authentication.default.loadSnarky();
+            const loadedSnarky = await authentication.loadSnarky();
           } catch (e) {
             console.log("error loading snarky", e);
           }
           console.log("loadedSnarky");
-          const hasWallet = await _Authentication.default.checkForWallet();
+          const hasWallet = await authentication.checkForWallet();
           if (!hasWallet) {
             setState({
               ...state,
               hasWallet: false,
-              snarkyLoaded: true
+              o1jsLoaded: true
             });
             return;
           } else {
             setState({
               ...state,
               hasWallet: true,
-              snarkyLoaded: true,
+              o1jsLoaded: true,
               showRequestingAccount: true
             });
             console.log("has wallet");
           }
           console.log("requesting account");
-          const loginResult = await _Authentication.default.login();
+          const loginResult = await authentication.login();
           console.log("login result", loginResult);
           if (loginResult.error == "user reject") {
             Snackbar("You cancelled connection with Mina wallet!", 1500);
@@ -97,37 +90,37 @@ const ZkShield = _ref => {
               ...state,
               showCreateWallet: true,
               hasWallet: true,
-              snarkyLoaded: true,
+              o1jsLoaded: true,
               showRequestingAccount: false
             });
           }
           console.log("checking account");
-          const accountExists = await _Authentication.default.doesAccountExist();
+          const accountExists = await authentication.doesAccountExist();
           if (!accountExists) {
             setState({
               ...state,
               showFundAccount: true,
               showCreateWallet: false,
               hasWallet: true,
-              snarkyLoaded: true,
+              o1jsLoaded: true,
               showRequestingAccount: false
             });
           } else {
-            var _Authentication$zkCli;
+            var _authentication$zkCli;
             setState({
               ...state,
               showLoadingContracts: true,
               showFundAccount: false,
               showCreateWallet: false,
               hasWallet: true,
-              snarkyLoaded: true,
+              o1jsLoaded: true,
               showRequestingAccount: false,
               userAddress: true
             });
-            const hasBeenSetup = await _Authentication.default.setupContracts();
+            const hasBeenSetup = await authentication.setupContracts();
             setUserAuthenticated(true);
-            setUserAddress(_Authentication.default.address);
-            //const hasBeenSetup = Authentication.setupBjjPromoteContracts();
+            setUserAddress(authentication.address);
+            //const hasBeenSetup = authentication.setupBjjPromoteContracts();
             setState({
               ...state,
               hasBeenSetup: hasBeenSetup,
@@ -135,27 +128,27 @@ const ZkShield = _ref => {
               showFundAccount: false,
               showCreateWallet: false,
               hasWallet: true,
-              snarkyLoaded: true,
+              o1jsLoaded: true,
               showRequestingAccount: false,
-              userAddress: _Authentication.default.address,
-              authentication: _Authentication.default
+              userAddress: authentication.address,
+              authentication: authentication
             });
             console.log('fetching account');
-            (_Authentication$zkCli = _Authentication.default.zkClient) === null || _Authentication$zkCli === void 0 || _Authentication$zkCli.fetchAccount({
-              publicKey: _o1js.PublicKey.fromBase58(_Authentication.default.contractAddress)
+            (_authentication$zkCli = authentication.zkClient) === null || _authentication$zkCli === void 0 || _authentication$zkCli.fetchAccount({
+              publicKey: _o1js.PublicKey.fromBase58(authentication.contractAddress)
             });
             console.log('fetching account done');
             setFirstFetchAccount(true);
             setAuthState({
               ...authState,
               userAuthenticated: true,
-              userAddress: _Authentication.default.address,
+              userAddress: authentication.address,
               firstFetchAccount: true,
               alertAvailable: true,
               alertMessage: 'Successfully logged in'
             });
             // console.log('fetching storage root');
-            // let root = await Authentication.zkClient.getNum();
+            // let root = await authentication.zkClient.getNum();
             // console.log("storage root", root.toString());
           }
         }
@@ -164,7 +157,7 @@ const ZkShield = _ref => {
   }, []);
   const loginClicked = async () => {
     try {
-      const loggedIn = await _Authentication.default.login();
+      const loggedIn = await authentication.login();
       if (loggedIn) {
         Router.push('/dashboard');
       }
@@ -174,8 +167,8 @@ const ZkShield = _ref => {
         Snackbar("You cancelled connection with Mina wallet!", 1500);
       }
     }
-    // const loggedIn = Authentication.login();
-    // if (Authentication.loggedIn) {
+    // const loggedIn = authentication.login();
+    // if (authentication.loggedIn) {
     //   Router.push('/dashboard')
     // }
   };
@@ -197,11 +190,11 @@ const ZkShield = _ref => {
   }, "Getting things ready"), /*#__PURE__*/React.createElement("div", {
     className: "pt-20"
   }, /*#__PURE__*/React.createElement("div", {
-    className: "".concat(!state.snarkyLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''),
+    className: "".concat(!state.o1jsLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''),
     "data-reveal-delay": "400"
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      display: state.snarkyLoaded ? "none" : "block"
+      display: state.o1jsLoaded ? "none" : "block"
     }
   }, "Loading ", /*#__PURE__*/React.createElement("span", {
     className: "text-color-primary"

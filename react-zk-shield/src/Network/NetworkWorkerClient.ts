@@ -18,6 +18,18 @@ export default class NetworkWorkerClient {
         delete this.promises[event.data.id];
       };
     }
+
+    loado1js() {
+      return this._call('loado1js', {});
+    }
+
+    setupActiveInstance() {
+      return this._call('setActiveInstance', {});
+    }
+
+    fetchUserAccount(publicKey58: string) {
+      return this._call('fetchUserAccount', { publicKey58 });
+    }
   
     _call(fn: NetworkWorkerFunctions, args: any) {
       return new Promise((resolve, reject) => {
