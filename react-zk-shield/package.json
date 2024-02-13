@@ -1,7 +1,8 @@
 {
   "name": "react-zk-shield",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "main": "lib/ZkShield.js",
+  "type": "module",
   "dependencies": {
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
