@@ -6,7 +6,7 @@ import GradientBG from '../components/GradientBG.js';
 import styles from '../styles/Home.module.css';
 import heroMinaLogo from '../../public/assets/hero-mina-logo.svg';
 import arrowRightSmall from '../../public/assets/arrow-right-small.svg';
-import {Button} from 'zkShield';
+import {Button, ZkShield} from 'zkshield';
 export default function Home() {
   useEffect(() => {
     (async () => {
@@ -35,6 +35,7 @@ export default function Home() {
         <link rel="icon" href="/assets/favicon.ico" />
       </Head>
       <GradientBG>
+<ZkShield validate={true}>
 
         <main className={styles.main}>
           <div className={styles.center}>
@@ -145,6 +146,8 @@ export default function Home() {
             </a>
           </div>
         </main>
+        
+</ZkShield>
       </GradientBG>
     </>
   );

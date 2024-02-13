@@ -2803,4 +2803,248 @@ const Button = ({ label }) => {
     return React.createElement("button", null, label);
 };
 
-export { Button };
+/******************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise, SuppressedError, Symbol */
+
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+    var e = new Error(message);
+    return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+};
+
+class Authentication {
+    constructor(mina, networkClient) {
+        this.networkClient = networkClient;
+        this.mina = mina;
+        this.networkClient = networkClient;
+    }
+    loadO1js() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.networkClient.loado1js();
+            yield this.networkClient.setupActiveInstance();
+            this.o1jsLoaded = true;
+            return true;
+        });
+    }
+    checkForWallet() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const mina = window.mina;
+            this.hasWallet = mina != null;
+            return this.hasWallet;
+        });
+    }
+    login() {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                this.address = (yield this.mina.requestAccounts())[0];
+                this.loggedIn = true;
+                console.log("logged in: ", this.address);
+                return {
+                    success: true
+                };
+            }
+            catch (e) {
+                this.loggedIn = false;
+                var result = {
+                    success: false,
+                    error: "",
+                    message: ""
+                };
+                if (e.message == "user reject") {
+                    result.error = e.message;
+                    result.message = "You cancelled connection with Mina wallet!";
+                }
+                else if (e.message == "please create or restore wallet first") {
+                    result.error = e.message;
+                    result.message = "Please create or restore a wallet first!";
+                }
+                return result;
+            }
+        });
+    }
+    doesAccountExist() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = yield this.networkClient.fetchUserAccount(this.address);
+            console.log("does account exist", res);
+            this.fundAccount = res.error != null;
+            return !this.fundAccount;
+        });
+    }
+    getShortAddress() {
+        return this.address.substring(0, 5) + "..." + this.address.substring(this.address.length - 5, this.address.length);
+    }
+}
+
+class NetworkWorkerClient {
+    constructor() {
+        this.worker = new Worker(new URL('./NetworkWorker.js', import.meta.url));
+        this.promises = {};
+        this.nextId = 0;
+        this.worker.onmessage = (event) => {
+            this.promises[event.data.id].resolve(event.data.data);
+            delete this.promises[event.data.id];
+        };
+    }
+    loado1js() {
+        return this._call('loado1js', {});
+    }
+    setupActiveInstance() {
+        return this._call('setActiveInstance', {});
+    }
+    fetchUserAccount(publicKey58) {
+        return this._call('fetchUserAccount', { publicKey58 });
+    }
+    _call(fn, args) {
+        return new Promise((resolve, reject) => {
+            this.promises[this.nextId] = { resolve, reject };
+            const message = {
+                id: this.nextId,
+                fn,
+                args,
+            };
+            this.worker.postMessage(message);
+            this.nextId++;
+        });
+    }
+}
+
+const AuthContext = reactExports.createContext({ userAuthenticated: false, userAddress: '' });
+const ZkShield = (props) => {
+    const network = new NetworkWorkerClient();
+    const authentication = new Authentication(window.mina, network);
+    let [state, setState] = reactExports.useState({
+        hasWallet: authentication.hasWallet,
+        hasBeenSetup: props.validate ? authentication.hasBeenSetup : true,
+        accountExists: authentication.accountExists,
+        currentNum: null,
+        publicKey: null,
+        zkappPublicKey: null,
+        creatingTransaction: false,
+        o1jsLoaded: authentication.o1jsLoaded,
+        showRequestingAccount: false,
+        showCreateWallet: false,
+        showFundAccount: false,
+        showLoadingContracts: false,
+        userAddress: '',
+    });
+    let [authState, setAuthState] = reactExports.useState({
+        userAuthenticated: false,
+        userAddress: '',
+    });
+    const [userAuthenticated, setUserAuthenticated] = reactExports.useState(false);
+    const [userAddress, setUserAddress] = reactExports.useState('');
+    reactExports.useState(false);
+    reactExports.useEffect(() => {
+        function timeout(seconds) {
+            return new Promise(function (resolve) {
+                setTimeout(function () {
+                    resolve();
+                }, seconds * 1000);
+            });
+        }
+        (() => __awaiter(void 0, void 0, void 0, function* () {
+            if (!authentication.loggedIn) {
+                if (!state.hasBeenSetup) {
+                    yield timeout(15);
+                    try {
+                        const loadedSnarky = yield authentication.loadO1js();
+                    }
+                    catch (e) {
+                        console.log("error loading o1js", e);
+                    }
+                    const hasWallet = yield authentication.checkForWallet();
+                    if (!hasWallet) {
+                        setState(Object.assign(Object.assign({}, state), { hasWallet: false, o1jsLoaded: true }));
+                        return;
+                    }
+                    else {
+                        setState(Object.assign(Object.assign({}, state), { hasWallet: true, o1jsLoaded: true, showRequestingAccount: true }));
+                    }
+                    console.log("requesting account");
+                    const loginResult = yield authentication.login();
+                    console.log("login result", loginResult);
+                    if (loginResult.error == "user reject") {
+                        console.log("You cancelled connection with Mina wallet!", loginResult);
+                    }
+                    else if (loginResult.error == "please create or restore wallet first") {
+                        console.log("please create or restore wallet first");
+                        setState(Object.assign(Object.assign({}, state), { showCreateWallet: true, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false }));
+                    }
+                    console.log("checking account");
+                    const accountExists = yield authentication.doesAccountExist();
+                    if (!accountExists) {
+                        setState(Object.assign(Object.assign({}, state), { showFundAccount: true, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false }));
+                    }
+                    else {
+                        setState(Object.assign(Object.assign({}, state), { showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false, userAddress: authentication.address }));
+                        const hasBeenSetup = true;
+                        setUserAuthenticated(true);
+                        setUserAddress(authentication.address);
+                        setState(Object.assign(Object.assign({}, state), { hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false, userAddress: authentication.address }));
+                        setAuthState(Object.assign(Object.assign({}, authState), { userAuthenticated: true, userAddress: authentication.address }));
+                    }
+                }
+            }
+        }))();
+    }, []);
+    return (React.createElement("div", null, !state.hasBeenSetup ?
+        React.createElement("main", null,
+            React.createElement("div", { className: 'rankproof-page' },
+                React.createElement("div", { className: 'rankproof-content-wrap' },
+                    React.createElement("div", { className: "hero min-h-screen bg-base-200" },
+                        React.createElement("div", { className: "hero-content text-center" },
+                            React.createElement("div", { className: "max-w-md" },
+                                React.createElement("h1", { className: "text-5xl font-bold" }, "Getting things ready"),
+                                React.createElement("div", { className: 'pt-20' },
+                                    React.createElement("div", { className: `${!state.o1jsLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''}`, "data-reveal-delay": "400" },
+                                        React.createElement("div", { style: { display: state.o1jsLoaded ? "none" : "block" } },
+                                            "Loading ",
+                                            React.createElement("span", { className: "text-color-primary" }, "o1js"),
+                                            "..."),
+                                        state.hasWallet != null && !state.hasWallet &&
+                                            React.createElement("div", { className: 'text-color-warning' },
+                                                "Could not find a wallet. Install Auro wallet here",
+                                                React.createElement("div", { className: 'pt-4' },
+                                                    React.createElement("a", { className: 'btn btn-accent', href: 'https://www.aurowallet.com/', target: "_blank", rel: "noreferrer" }, "Auro wallet"))),
+                                        state.showRequestingAccount &&
+                                            React.createElement("div", null, "Requesting account"),
+                                        state.showCreateWallet &&
+                                            React.createElement("div", { className: 'text-color-warning' }, "Please create or restore a wallet first!"),
+                                        state.showFundAccount &&
+                                            React.createElement("div", { className: 'text-color-warning' },
+                                                "Your account does not exist, visit thefaucet to fund your account",
+                                                React.createElement("div", { className: 'pt-4' },
+                                                    React.createElement("a", { className: 'btn btn-accent', href: "https://faucet.minaprotocol.com/", target: "_blank", rel: "noreferrer" }, "Faucet"))),
+                                        state.showLoadingContracts &&
+                                            React.createElement("div", null, "Loading contracts..."))),
+                                React.createElement("div", { className: 'pt-20' },
+                                    React.createElement("span", { className: "loading loading-bars loading-lg" }))))))))
+        :
+            React.createElement("div", null,
+                React.createElement(AuthContext.Provider, { value: authState }, props.children))));
+};
+
+export { AuthContext, Button, ZkShield };

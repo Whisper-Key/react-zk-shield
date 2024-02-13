@@ -5,4 +5,15 @@ interface ButtonProps {
 }
 declare const Button: ({ label }: ButtonProps) => React.JSX.Element;
 
-export { Button };
+interface ZkShieldProps {
+    validate: boolean;
+    children: React.ReactElement;
+}
+type ZkShieldState = {
+    userAuthenticated: boolean;
+    userAddress: string;
+};
+declare const AuthContext: React.Context<ZkShieldState>;
+declare const ZkShield: (props: ZkShieldProps) => React.JSX.Element;
+
+export { AuthContext, Button, ZkShield };
