@@ -6,7 +6,7 @@ import GradientBG from '../components/GradientBG.js';
 import styles from '../styles/Home.module.css';
 import heroMinaLogo from '../../public/assets/hero-mina-logo.svg';
 import arrowRightSmall from '../../public/assets/arrow-right-small.svg';
-import {ZkShield} from 'react-zk-shield';
+import {Button} from 'zkShield';
 export default function Home() {
   useEffect(() => {
     (async () => {
@@ -35,10 +35,10 @@ export default function Home() {
         <link rel="icon" href="/assets/favicon.ico" />
       </Head>
       <GradientBG>
-      <ZkShield validate={false}>
 
         <main className={styles.main}>
           <div className={styles.center}>
+          <Button label="zk is shielded"/>
             <a
               href="https://minaprotocol.com/"
               target="_blank"
@@ -145,7 +145,6 @@ export default function Home() {
             </a>
           </div>
         </main>
-        </ZkShield>
       </GradientBG>
     </>
   );
