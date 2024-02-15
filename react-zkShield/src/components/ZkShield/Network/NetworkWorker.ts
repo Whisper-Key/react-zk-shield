@@ -24,6 +24,7 @@ const functions = {
     },
 
     fetchUserAccount: async (args: { publicKey58: string }) => {
+        console.log('fetchUserAccount from worker', args.publicKey58);
         const account = await network.fetchUserAccount(args.publicKey58);
         return account;
     },

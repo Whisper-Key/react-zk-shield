@@ -18,6 +18,14 @@ export class Authentication {
         this.networkClient = networkClient;
         this.mina = mina;
         this.networkClient = networkClient;
+        this.loggedIn = false;
+        this.hasWallet = false;
+        this.hasBeenSetup = false;
+        this.accountExists = false;
+        this.o1jsLoaded = false;
+        this.showRequestingAccount = false;
+        this.showCreateWallet = false;
+        this.fundAccount = false;
     }
 
     async loadO1js(): Promise<boolean> {

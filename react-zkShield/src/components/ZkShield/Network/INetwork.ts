@@ -16,6 +16,7 @@ export class NetworkFactory {
 
         if (!network) {
             network = process.env.REACT_APP_NETWORK as networks || "LocalBlockchain";
+            console.log("connecting to local blockchain...");
         }
 
         switch (network) {

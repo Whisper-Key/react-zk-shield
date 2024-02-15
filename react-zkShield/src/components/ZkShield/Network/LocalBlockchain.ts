@@ -2,6 +2,8 @@ import { INetwork } from "./INetwork.js";
 import {
     Mina,
     PrivateKey,
+    PublicKey,
+    fetchAccount,
 } from 'o1js'
 
 export class LocalBlockchain implements INetwork {
@@ -19,8 +21,10 @@ export class LocalBlockchain implements INetwork {
 
     }
 
-    fetchUserAccount(publicKey: string) {
-        
+    async fetchUserAccount(publicKey: string) {
+        console.log("no fetching using local blockchain");
+      return {error:null};
+      
     }
 
     attachAccount(privateKey: string) {

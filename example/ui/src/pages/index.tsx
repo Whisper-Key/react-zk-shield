@@ -20,11 +20,11 @@ export default function Home() {
         <link rel="icon" href="/assets/favicon.ico" />
       </Head>
       <GradientBG>
-<ZkShield validate={true}>
+<ZkShield validate={false}>
         <main className={styles.main}>
           <div className={styles.center}>
           <Button label="zk is shielded"/>
-            <a
+            <a  
               href="https://minaprotocol.com/"
               target="_blank"
               rel="noopener noreferrer"

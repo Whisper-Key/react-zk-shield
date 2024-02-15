@@ -2,6 +2,8 @@ import { INetwork } from "./INetwork.js";
 import {
   Mina,
   PrivateKey,
+  PublicKey,
+  fetchAccount,
 } from 'o1js'
 
 export class RemoteBlockchain implements INetwork {
@@ -26,7 +28,10 @@ export class RemoteBlockchain implements INetwork {
     Mina.setActiveInstance(this.blockchain);
   }
 
-  fetchUserAccount(publicKey: string) {
-    
+  async fetchUserAccount(publicKey: string) {
+    const publicKeyType = PublicKey.fromBase58(publicKey);
+      let fetch = await fetchAccount({ publicKey });
+      console.log("fetched @ ", new Date().toLocaleTimeString());
+      return fetch;
   }
 }

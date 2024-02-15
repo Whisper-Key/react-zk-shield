@@ -35,9 +35,10 @@ export type ZkShieldState = {
 const AuthContext = createContext<ZkShieldState>({userAuthenticated: false, userAddress: ''} as ZkShieldState);
 
 const ZkShield = (props: ZkShieldProps) => {
+  console.log("ZkShield props", props);
   let [state, setState] = useState<ZkShieldInternalState>({
     hasWallet: false,
-    hasBeenSetup: props.validate,
+    hasBeenSetup: false,
     accountExists:false,
     creatingTransaction: false,
     o1jsLoaded: false,
@@ -70,24 +71,32 @@ const ZkShield = (props: ZkShieldProps) => {
 
 
     (async () => {
+      console.log("loading network");
       const network = new NetworkWorkerClient();
       const authentication = new Authentication((window as any).mina , network);
-
+      console.log("network loaded");
+      setState({ ...state, hasBeenSetup: props.validate ? authentication.hasBeenSetup!: true });
       if (!authentication.loggedIn) {
+        console.log("not logged in");
+        console.log("has not been setup", !state.hasBeenSetup);
         if (!state.hasBeenSetup) {
+          console.log("not setup");
           await timeout(15);
           try {
             const loadedSnarky = await authentication.loadO1js();
           } catch (e) {
             console.log("error loading o1js", e);
           }
+          console.log("checking for wallet");
           
           const hasWallet = await authentication.checkForWallet();
           if (!hasWallet) {
+            console.log("no wallet");
             setState({ ...state, hasWallet: false, o1jsLoaded: true });
             return;
           }
           else {
+            console.log("has wallet");
             setState({ ...state, hasWallet: true, o1jsLoaded: true, showRequestingAccount: true });
           }
           console.log("requesting account");
