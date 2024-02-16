@@ -22,7 +22,7 @@ export class LocalBlockchain implements INetwork {
     }
 
     async fetchUserAccount(publicKey: string) {
-        console.log("no fetching using local blockchain");
+        console.log("no fetching we are using local blockchain");
       return {error:null};
       
     }

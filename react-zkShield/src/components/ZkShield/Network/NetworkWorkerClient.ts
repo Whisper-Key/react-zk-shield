@@ -27,6 +27,7 @@ export default class NetworkWorkerClient {
     }
 
     fetchUserAccount(publicKey58: string) {
+      console.log('fetchUserAccount from worker', publicKey58);
       return this._call('fetchUserAccount', { publicKey58 });
     }
   

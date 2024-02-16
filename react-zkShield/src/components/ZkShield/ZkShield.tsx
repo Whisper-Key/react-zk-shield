@@ -113,19 +113,23 @@ const ZkShield = (props: ZkShieldProps) => {
 
           console.log("checking account");
           const accountExists = await authentication.doesAccountExist();
+          console.log("account exists", accountExists);
           if (!accountExists) {
+            console.log("account does not exist");
             setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false });
           }
           else {
+            console.log("account exists");
+            console.log("setting state", authentication.address);
             setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false, userAddress: authentication.address! });
             const hasBeenSetup = true;
             setUserAuthenticated(true);
             setUserAddress(authentication.address);
             
             setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, o1jsLoaded: true, showRequestingAccount: false, userAddress: authentication.address });
-
+            console.log("setting auth state", authentication.address);
             setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address });
-
+            console.log("auth state", authState);
           }
 
         }

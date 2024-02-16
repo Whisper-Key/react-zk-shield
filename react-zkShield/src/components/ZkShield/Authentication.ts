@@ -70,10 +70,15 @@ export class Authentication {
     }
     
     async doesAccountExist(): Promise<boolean> {
+        try {
         const res = await this.networkClient.fetchUserAccount(this.address) as any;
         console.log("does account exist", res);
         this.fundAccount = res.error != null;
         return !this.fundAccount;
+        } catch (e) {
+            console.log("error fetching account", e);
+            return false;
+        }
     }
 
     getShortAddress(): string {
