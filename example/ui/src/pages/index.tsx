@@ -5,7 +5,7 @@ import { useContext, useEffect } from 'react';
 import GradientBG from '../components/GradientBG.js';
 import styles from '../styles/Home.module.css';
 // import { AuthPage } from '../components/Shield/AuthPage.js';
-import { AuthPage } from 'zkshield';
+import { ZkShield } from 'zkshield';
 
 import heroMinaLogo from '../../public/assets/hero-mina-logo.svg';
 import arrowRightSmall from '../../public/assets/arrow-right-small.svg';
@@ -23,7 +23,7 @@ export default function Home() {
         <link rel="icon" href="/assets/favicon.ico" />
       </Head>
       <GradientBG>
-      <AuthPage validate={true}>
+      <ZkShield validate={true}>
         <ShieldedHeading />
           <main className={styles.main}>
             <div className={styles.center}>
@@ -134,7 +134,7 @@ export default function Home() {
               </a>
             </div>
           </main>
-        </AuthPage>
+        </ZkShield>
       </GradientBG>
     </>
   );
