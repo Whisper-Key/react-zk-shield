@@ -4,13 +4,15 @@ import Image from 'next/image';
 import { useContext, useEffect } from 'react';
 import GradientBG from '../components/GradientBG.js';
 import styles from '../styles/Home.module.css';
+// import { AuthPage } from '../components/Shield/AuthPage.js';
+import { AuthPage } from 'zkshield';
+
 import heroMinaLogo from '../../public/assets/hero-mina-logo.svg';
 import arrowRightSmall from '../../public/assets/arrow-right-small.svg';
-import { Button, ZkShield, AuthContext } from 'zkshield';
 import React from 'react';
+import ShieldedHeading from '@/components/ShieldedHeading';
 
 export default function Home() {
-  const authState = useContext(AuthContext);
 
 
   return (
@@ -21,11 +23,11 @@ export default function Home() {
         <link rel="icon" href="/assets/favicon.ico" />
       </Head>
       <GradientBG>
-        <ZkShield validate={true}>
+      <AuthPage validate={true}>
+        <ShieldedHeading />
           <main className={styles.main}>
             <div className={styles.center}>
-              <h1>Authenticated is {authState.userAuthenticated.toString()}</h1>
-              <Button label="zk is shielded" />
+              
               <a
                 href="https://minaprotocol.com/"
                 target="_blank"
@@ -132,7 +134,7 @@ export default function Home() {
               </a>
             </div>
           </main>
-        </ZkShield>
+        </AuthPage>
       </GradientBG>
     </>
   );
