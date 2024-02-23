@@ -207,3 +207,13 @@
     grid-template-columns: repeat(2, 50%);
   }
 }
+
+
+.headerShield {
+ background-color: aquamarine;
+ color: coral;
+}
+.statusShield {
+ background-color: chocolate;
+ font-style: italic;
+}

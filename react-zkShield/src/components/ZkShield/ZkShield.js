@@ -4,19 +4,33 @@ import NetworkWorkerClient from './Network/NetworkWorkerClient.js';
 import { useEffect, useState, createContext } from "react";
 import React from 'react';
 
+import PropTypes from 'prop-types';
+
 import {
   PublicKey,
   PrivateKey,
   Field,
 } from 'o1js'
 
+
 const AuthContext = createContext();
-const ZkShield = ({ validate, children }) => {
+const ZkShield = ({ 
+  mainContainerClassName, 
+  innerContainerClassName, 
+  headerClassName,
+  headerText,
+  statusClassName,
+  walletNotFoundText,
+  createWalletText,
+  requestingAccountText,
+  fundAccountText,
+  ignoreConnectForTesting, 
+  children }) => {
 
   let [state, setState] = useState({
     authentication: null,
     hasWallet: null,//Authentication.hasWallet,
-    hasBeenSetup: false,//validate ? Authentication.hasBeenSetup : true,
+    hasBeenSetup: ignoreConnectForTesting ?? false,//validate ? Authentication.hasBeenSetup : true,
     accountExists: false,//Authentication.accountExists,
     currentNum: null,
     publicKey: null,
@@ -123,29 +137,33 @@ const ZkShield = ({ validate, children }) => {
       {!state.hasBeenSetup ?
 
 
-          <div className="shield-main-container">
-            <div className="shield-inner-container">
-              <h1 className="">Getting things ready</h1>
-              <div className="">
+          <div className={mainContainerClassName ?? "shield-main-container"}>
+            <div className={innerContainerClassName ?? "shield-inner-container"}>
+              <h1 className={headerClassName ?? "" }>{headerText ?? "Getting things ready" }</h1>
+              <div className={ statusClassName ?? "" }>
                 <div className={`${!state.snarkyLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''}`} data-reveal-delay="400">
                   <div style={{ display: state.snarkyLoaded ? "none" : "block" }}>
                     Loading <span className="text-color-primary">o1js</span>...
                   </div>
                   {state.hasWallet != null && !state.hasWallet &&
                     <div className='text-color-warning'>
-                      Could not find a wallet. Install Auro wallet here
+                      { walletNotFoundText ?? "Could not find a wallet. Install Auro wallet here" }
                       <div className='pt-4'>
                         <a className='btn btn-accent' href='https://www.aurowallet.com/' target="_blank" rel="noreferrer">Auro wallet</a>
                       </div>
                     </div>}
 
                   {state.showRequestingAccount &&
-                    <div>Requesting account</div>}
+                    <div>{ requestingAccountText ?? "Requesting account" }</div>
+                  }
 
                   {state.showCreateWallet &&
-                    <div className='text-color-warning'>Please create or restore a wallet first!</div>}
+                    <div className='text-color-warning'>
+                      { createWalletText ?? "Please create or restore a wallet first!" }
+                    </div>}
                   {state.showFundAccount &&
-                    <div className='text-color-warning'>Your account does not exist, visit thefaucet to fund your account
+                    <div className='text-color-warning'>
+                      { fundAccountText ?? "Your account does not exist, visit thefaucet to fund your account" }
                       <div className='pt-4'>
                         <a className='btn btn-accent'
                           href="https://faucet.minaprotocol.com/" target="_blank" rel="noreferrer">Faucet</a></div>
@@ -178,5 +196,19 @@ const ZkShield = ({ validate, children }) => {
   );
 
 }
+
+ZkShield.propTypes = {
+  mainContainerClassName: PropTypes.string,
+  innerContainerClassName: PropTypes.string,
+  headerClassName: PropTypes.string,
+  headerText: PropTypes.string,
+  statusClassName: PropTypes.string,
+  walletNotFoundText: PropTypes.string,
+  createWalletText: PropTypes.string,
+  requestingAccountText: PropTypes.string,
+  fundAccountText: PropTypes.string,
+  ignoreConnectForTesting: PropTypes.bool,
+  children: PropTypes.node.isRequired
+};
 
 export { AuthContext, ZkShield };

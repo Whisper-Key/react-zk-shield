@@ -15,6 +15,7 @@ const ShieldedHeading = () => {
     <>
     <div>
       <h1>{authState.userAuthenticated && authState.userAddress }</h1>
+      <h1>{!authState.userAuthenticated && "Not connected to a wallet!" }</h1>
     </div>
     </>  );
 }
