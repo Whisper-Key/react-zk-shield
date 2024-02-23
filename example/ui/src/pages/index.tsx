@@ -23,7 +23,7 @@ export default function Home() {
         <link rel="icon" href="/assets/favicon.ico" />
       </Head>
       <GradientBG>
-      <ZkShield validate={true}>
+      <ZkShield mainContainerClassName="center" headerText={"Loading things"} ignoreConnectForTesting={false}>
         <ShieldedHeading />
           <main className={styles.main}>
             <div className={styles.center}>
