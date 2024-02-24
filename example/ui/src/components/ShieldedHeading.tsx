@@ -9,7 +9,7 @@ import Router from 'next/router';
 
 const ShieldedHeading = () => {
   const [authState, setAuthState] = useContext(AuthContext);
-
+  console.log("authState", authState);
 
   return (
     <>

@@ -1,15 +1,47 @@
 import { get } from "http";
-import { IWalletProvider } from "../IWalletProvider";
-import { WalletConnectResult } from "../WalletConnectResult";
-import { WalletAccount } from "../WalletAccount";
+import { IWalletProvider } from "../IWalletProvider.js";
+import { WalletConnectResult } from "../WalletConnectResult.js";
+import { WalletAccount } from "../WalletAccount.js";
+import { SignedMessageResult } from "../SignedMessageResult.js";
+import { WalletTransactionResult } from "../WalletTransactionResult.js";
 
 export class AuroWalletProvider implements IWalletProvider {
     name: string = "AuroWallet";
     mina: any;
 
-    constructor(name: string, mina: any) {
-        this.name = name;
+    constructor(mina: any) {
         this.mina = mina;
+    }
+    async sendZkTransaction(json: string, fee: number, memo: string): Promise<WalletTransactionResult> {
+        try {
+            const { hash } = await this.mina.sendTransaction({
+                transaction: json,
+                feePayer: {
+                    fee: fee,
+                    memo: memo
+                }
+            });
+            return new WalletTransactionResult(true, hash, "", "", "", hash);
+        } catch (e: any) {
+            var result = this.getWalletTransactionError(e);
+            return result;
+        }
+    }
+    getWalletTransactionError(e: any): WalletTransactionResult {
+        return new WalletTransactionResult(false, "", e.code, e.message, e.message, e.data);
+    }
+
+    async signMessage(message: string): Promise<SignedMessageResult> {
+        try {
+            const signResult = await this.mina?.signMessage({ message: message });
+            return new SignedMessageResult(true, "", "", "", signResult, null);
+        } catch (e: any) {
+            var result = this.getSignedMessageError(e);
+            return result;
+        }
+    }
+    getSignedMessageError(e: any): SignedMessageResult {
+        return new SignedMessageResult(false, e.code, e.message, e.message, e.data, e);
     }
 
     hasWallet(): boolean {
@@ -25,12 +57,12 @@ export class AuroWalletProvider implements IWalletProvider {
             return new WalletConnectResult(true, account, "", "", "");
         } catch (e: any) {
 
-            var result = this.getErrorResult(e);
+            var result = this.getWalletConnectError(e);
             return result;
         }
     }
 
-    private getErrorResult(e: any): WalletConnectResult {
+    private getWalletConnectError(e: any): WalletConnectResult {
 
         const errorKey = Object.keys(this.friendlyErrorMap).find(key => e.message.toLowerCase().includes(key.toLowerCase()));
 
@@ -38,11 +70,11 @@ export class AuroWalletProvider implements IWalletProvider {
         result.errorCode = e.code;
         result.errorMessage = e.message;
         result.friendlyErrorMessage = this.friendlyErrorMap[errorKey!] || e.message;
-      
+
         return result;
     }
 
-    private friendlyErrorMap:any  = {
+    private friendlyErrorMap: any = {
         "user reject": "You cancelled connection with Mina wallet!",
         "create or restore wallet": "Please create or restore a wallet first!"
     }

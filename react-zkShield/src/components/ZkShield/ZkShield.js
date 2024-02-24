@@ -1,6 +1,6 @@
 import { Authentication } from './Authentication.js';
 import NetworkWorkerClient from './Network/NetworkWorkerClient.js';
-
+import { AuroWalletProvider } from './Wallet/WalletProviders/AuroWalletProvider.js';
 import { useEffect, useState, createContext } from "react";
 import React from 'react';
 
@@ -25,6 +25,7 @@ const ZkShield = ({
   requestingAccountText,
   fundAccountText,
   ignoreConnectForTesting, 
+  minaWalletProvider,
   children }) => {
 
   let [state, setState] = useState({
@@ -73,11 +74,12 @@ const ZkShield = ({
     (async () => {
 
       const network = new NetworkWorkerClient();
-      const authentication = new Authentication(window.mina, network);
+      const walletProvider = minaWalletProvider ?? new AuroWalletProvider(window.mina);
+      const authentication = new Authentication(walletProvider, network);
       if (!authentication.loggedIn) {
         if (!state.hasBeenSetup) {
           console.log("setting up");
-          await timeout(15);
+          await timeout(5);
           console.log("loading snarky");
           try {
             const loadedSnarky = await authentication.loadSnarky();
@@ -99,11 +101,8 @@ const ZkShield = ({
           const loginResult = await authentication.login();
           console.log("login result", loginResult);
 
-          if (loginResult.error == "user reject") {
-            Snackbar("You cancelled connection with Mina wallet!", 1500);
-          }
-          else if (loginResult.error == "please create or restore wallet first") {
-            console.log("please create or restore wallet first");
+          if (!loginResult.connected) {
+            console.log(loginResult.friendlyErrorMessage);
             setState({ ...state, showCreateWallet: true, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
           }
 
@@ -208,7 +207,8 @@ ZkShield.propTypes = {
   requestingAccountText: PropTypes.string,
   fundAccountText: PropTypes.string,
   ignoreConnectForTesting: PropTypes.bool,
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
+  minaWalletProvider: PropTypes.object
 };
 
 export { AuthContext, ZkShield };

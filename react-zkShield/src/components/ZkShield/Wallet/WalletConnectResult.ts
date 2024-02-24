@@ -3,7 +3,7 @@ export class WalletConnectResult {
     connectedAccount: string = "";
     errorCode: string = "";
     errorMessage: string = "";
-     friendlyErrorMessage: string = "";
+    friendlyErrorMessage: string = "";
 
     constructor(connected: boolean, connectedAccount: string, errorCode: string, errorMessage: string, friendlyErrorMessage: string) {
         this.connected = connected;
@@ -12,5 +12,5 @@ export class WalletConnectResult {
         this.errorMessage = errorMessage;
         this.friendlyErrorMessage = friendlyErrorMessage;
     }
-   
+
 }

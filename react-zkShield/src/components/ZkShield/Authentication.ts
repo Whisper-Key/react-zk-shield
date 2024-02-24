@@ -1,7 +1,9 @@
 import NetworkWorkerClient from "./Network/NetworkWorkerClient.js";
 import { PublicKey } from "o1js";
+import { IWalletProvider } from "./Wallet/IWalletProvider.js";
+import { WalletConnectResult } from "./Wallet/WalletConnectResult.js";
 export class Authentication {
-    mina: any;
+    walletProvider: IWalletProvider;
     address!: string;
     loggedIn: boolean | undefined;
     authentication: any;
@@ -14,9 +16,9 @@ export class Authentication {
     fundAccount: boolean | undefined;
 
     networkClient: NetworkWorkerClient
-    constructor(mina: any, networkClient: NetworkWorkerClient) {
+    constructor(walletProvider: IWalletProvider, networkClient: NetworkWorkerClient) {
         this.networkClient = networkClient;
-        this.mina = mina;
+        this.walletProvider = walletProvider;
         this.networkClient = networkClient;
         this.loggedIn = false;
         this.hasWallet = false;
@@ -36,37 +38,13 @@ export class Authentication {
     }
 
     async checkForWallet(): Promise<boolean> {
-        const mina = (window as any).mina;
-        this.hasWallet = mina != null;
-        return this.hasWallet;
+        return this.walletProvider.hasWallet();
     }
     
-    async login(): Promise<any> {
-        try {
-            this.address = (await this.mina.requestAccounts())[0];
-            this.loggedIn = true;
-            console.log("logged in: ", this.address);
-            return {
-                success: true
-            };
-        } catch (e: any) {
-
-            this.loggedIn = false;
-            var result = {
-                success: false,
-                error: "",
-                message: ""
-            };
-            if (e.message == "user reject") {
-                result.error = e.message;
-                result.message = "You cancelled connection with Mina wallet!";
-            }
-            else if (e.message == "please create or restore wallet first") {
-                result.error = e.message;
-                result.message = "Please create or restore a wallet first!";
-            }
-            return result;
-        }
+    async login(): Promise<WalletConnectResult> {
+        const result = await this.walletProvider.connect();
+        this.address = result.connectedAccount;
+        return result;
     }
     
     async doesAccountExist(): Promise<boolean> {

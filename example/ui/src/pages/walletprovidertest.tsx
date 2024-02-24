@@ -5,7 +5,7 @@ import { useContext, useEffect } from 'react';
 import GradientBG from '../components/GradientBG.js';
 import styles from '../styles/Home.module.css';
 // import { AuthPage } from '../components/Shield/AuthPage.js';
-import { ZkShield } from 'zkshield';
+import { FakeConsoleWalletProvider, SignedMessageResult, WalletConnectResult, WalletTransactionResult, ZkShield } from 'zkshield';
 
 import heroMinaLogo from '../../public/assets/hero-mina-logo.svg';
 import arrowRightSmall from '../../public/assets/arrow-right-small.svg';
@@ -14,6 +14,10 @@ import ShieldedHeading from '@/components/ShieldedHeading';
 
 export default function Home() {
 
+  const provider = new FakeConsoleWalletProvider(true,
+    new WalletConnectResult(true, "", "", "", ""),
+  new WalletTransactionResult(true, "", "", "", "", ""),
+  new SignedMessageResult(true, "", "", "", "", ""));
 
   return (
     <>
@@ -24,7 +28,10 @@ export default function Home() {
       </Head>
       <GradientBG>
       <ZkShield  mainContainerClassName={styles.main} 
-                innerContainerClassName={styles.center} headerText={"Loading things"} ignoreConnectForTesting={false}>
+                innerContainerClassName={styles.center} 
+                headerText={"Loading things"} 
+                ignoreConnectForTesting={false}
+                minaWalletProvider={provider}>
         <ShieldedHeading />
           <main className={styles.main}>
             <div className={styles.center}>
