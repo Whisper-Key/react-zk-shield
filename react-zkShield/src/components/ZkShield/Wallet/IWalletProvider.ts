@@ -6,6 +6,7 @@ import { WalletTransactionResult } from "./WalletTransactionResult.js";
 
 export interface IWalletProvider {
     name: string;
+    description: string;
     hasWallet(): boolean;
     connect(): Promise<WalletConnectResult>;
     sendZkTransaction(json: string, fee: number, memo: string) : Promise<WalletTransactionResult>;

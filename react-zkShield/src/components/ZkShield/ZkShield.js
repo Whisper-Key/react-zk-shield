@@ -1,4 +1,5 @@
 import { Authentication } from './Authentication.js';
+import SelectProvider from './SelectProvider.js';
 import NetworkWorkerClient from './Network/NetworkWorkerClient.js';
 import { AuroWalletProvider } from './Wallet/WalletProviders/AuroWalletProvider.js';
 import { useEffect, useState, createContext } from "react";
@@ -14,9 +15,9 @@ import {
 
 
 const AuthContext = createContext();
-const ZkShield = ({ 
-  mainContainerClassName, 
-  innerContainerClassName, 
+const ZkShield = ({
+  mainContainerClassName,
+  innerContainerClassName,
   headerClassName,
   headerText,
   statusClassName,
@@ -24,7 +25,7 @@ const ZkShield = ({
   createWalletText,
   requestingAccountText,
   fundAccountText,
-  ignoreConnectForTesting, 
+  ignoreConnectForTesting,
   minaWalletProvider,
   children }) => {
 
@@ -44,6 +45,7 @@ const ZkShield = ({
     showLoadingContracts: false,
     userAddress: null,
     authentication: null,
+    providerSelected: false,
   });
 
   let [authState, setAuthState] = useState({
@@ -60,73 +62,95 @@ const ZkShield = ({
   const [userAddress, setUserAddress] = useState('');
   const [firstFetchAccount, setFirstFetchAccount] = useState(false);
 
+  function timeout(seconds) {
+    return new Promise(function (resolve) {
+      setTimeout(function () {
+        resolve();
+      }, seconds * 1000);
+    });
+  }
+
   useEffect(() => {
 
-    function timeout(seconds) {
-      return new Promise(function (resolve) {
-        setTimeout(function () {
-          resolve();
-        }, seconds * 1000);
-      });
-    }
+
 
 
     (async () => {
 
-      const network = new NetworkWorkerClient();
-      const walletProvider = minaWalletProvider ?? new AuroWalletProvider(window.mina);
-      const authentication = new Authentication(walletProvider, network);
-      if (!authentication.loggedIn) {
-        if (!state.hasBeenSetup) {
-          console.log("setting up");
-          await timeout(5);
-          console.log("loading snarky");
-          try {
-            const loadedSnarky = await authentication.loadSnarky();
-          } catch (e) {
-            console.log("error loading snarky", e);
-          }
+      if (minaWalletProvider) {
+        const network = new NetworkWorkerClient();
+        const walletProvider = minaWalletProvider ?? new AuroWalletProvider(window.mina);
+        const authentication = new Authentication(walletProvider, network);
+        setState({ ...state, providerSelected: true });
 
-          console.log("loadedSnarky");
-          const hasWallet = await authentication.checkForWallet();
-          if (!hasWallet) {
-            setState({ ...state, hasWallet: false, snarkyLoaded: true });
-            return;
-          }
-          else {
-            setState({ ...state, hasWallet: true, snarkyLoaded: true, showRequestingAccount: true });
-            console.log("has wallet");
-          }
-          console.log("requesting account");
-          const loginResult = await authentication.login();
-          console.log("login result", loginResult);
-
-          if (!loginResult.connected) {
-            console.log(loginResult.friendlyErrorMessage);
-            setState({ ...state, showCreateWallet: true, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
-          }
-
-          console.log("checking account");
-          const accountExists = await authentication.doesAccountExist();
-          if (!accountExists) {
-            setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
-          }
-          else {
-            setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: true });
-            const hasBeenSetup = true;
-            setUserAuthenticated(true);
-            setUserAddress(authentication.address);
-            setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication });
-
-            setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address, firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in' });
-
-          }
-
-        }
+        await providerSetup(authentication);
       }
     })();
   }, []);
 
+  const providerSetup = async (authentication) => {
+    setState({ ...state, providerSelected: true });
+
+    if (!authentication.loggedIn) {
+      if (!state.hasBeenSetup) {
+        console.log("setting up");
+        await timeout(5);
+        console.log("loading snarky");
+        try {
+          const loadedSnarky = await authentication.loadO1js();
+        } catch (e) {
+          console.log("error loading snarky", e);
+        }
+
+        console.log("loadedSnarky");
+        const hasWallet = await authentication.checkForWallet();
+        console.log("hasWallet", hasWallet);
+        if (!hasWallet) {
+          setState({ ...state, hasWallet: false, snarkyLoaded: true });
+          return;
+        }
+        else {
+          setState({ ...state, hasWallet: true, snarkyLoaded: true, showRequestingAccount: true });
+          console.log("has wallet");
+        }
+        console.log("requesting account");
+        const loginResult = await authentication.login();
+        console.log("login result", loginResult);
+
+        if (!loginResult.connected) {
+          console.log(loginResult.friendlyErrorMessage);
+          setState({ ...state, showCreateWallet: true, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
+        }
+
+        console.log("checking account");
+        const accountExists = await authentication.doesAccountExist();
+        if (!accountExists) {
+          setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
+        }
+        else {
+          setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: true });
+          const hasBeenSetup = true;
+          setUserAuthenticated(true);
+          setUserAddress(authentication.address);
+          setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication });
+
+          setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address, firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in' });
+
+        }
+
+      }
+    }
+  }
+
+  const providerSelected = async (provider) => {
+    console.log("provider selected in ZK Shield", provider);
+    const network = new NetworkWorkerClient();
+    const walletProvider = provider ?? new AuroWalletProvider(window.mina);
+    const authentication = new Authentication(walletProvider, network);
+    setState({ ...state, providerSelected: true });
+
+    await providerSetup(authentication);
+  }
 
 
   return (
@@ -136,51 +160,56 @@ const ZkShield = ({
       {!state.hasBeenSetup ?
 
 
-          <div className={mainContainerClassName ?? "shield-main-container"}>
-            <div className={innerContainerClassName ?? "shield-inner-container"}>
-              <h1 className={headerClassName ?? "" }>{headerText ?? "Getting things ready" }</h1>
-              <div className={ statusClassName ?? "" }>
-                <div className={`${!state.snarkyLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''}`} data-reveal-delay="400">
-                  <div style={{ display: state.snarkyLoaded ? "none" : "block" }}>
-                    Loading <span className="text-color-primary">o1js</span>...
-                  </div>
-                  {state.hasWallet != null && !state.hasWallet &&
-                    <div className='text-color-warning'>
-                      { walletNotFoundText ?? "Could not find a wallet. Install Auro wallet here" }
-                      <div className='pt-4'>
-                        <a className='btn btn-accent' href='https://www.aurowallet.com/' target="_blank" rel="noreferrer">Auro wallet</a>
-                      </div>
-                    </div>}
-
-                  {state.showRequestingAccount &&
-                    <div>{ requestingAccountText ?? "Requesting account" }</div>
-                  }
-
-                  {state.showCreateWallet &&
-                    <div className='text-color-warning'>
-                      { createWalletText ?? "Please create or restore a wallet first!" }
-                    </div>}
-                  {state.showFundAccount &&
-                    <div className='text-color-warning'>
-                      { fundAccountText ?? "Your account does not exist, visit thefaucet to fund your account" }
-                      <div className='pt-4'>
-                        <a className='btn btn-accent'
-                          href="https://faucet.minaprotocol.com/" target="_blank" rel="noreferrer">Faucet</a></div>
+        <div className={mainContainerClassName ?? "shield-main-container"}>
+          <div className={innerContainerClassName ?? "shield-inner-container"}>
+            {minaWalletProvider == null && !state.providerSelected && <SelectProvider providerSelectedHandler={providerSelected} />}
+            {state.providerSelected &&
+              <div>
+                <h1 className={headerClassName ?? ""}>{headerText ?? "Getting things ready"}</h1>
+                <div className={statusClassName ?? ""}>
+                  <div className={`${!state.snarkyLoaded || state.showRequestingAccount || state.showLoadingContracts ? 'loading-snarky' : ''}`} data-reveal-delay="400">
+                    <div style={{ display: state.snarkyLoaded ? "none" : "block" }}>
+                      Loading <span className="text-color-primary">o1js</span>...
                     </div>
-                  }
+                    {state.hasWallet != null && !state.hasWallet &&
+                      <div className='text-color-warning'>
+                        {walletNotFoundText ?? "Could not find a wallet. Install Auro wallet here"}
+                        <div className='pt-4'>
+                          <a className='btn btn-accent' href='https://www.aurowallet.com/' target="_blank" rel="noreferrer">Auro wallet</a>
+                        </div>
+                      </div>}
+
+                    {state.showRequestingAccount &&
+                      <div>{requestingAccountText ?? "Requesting account"}</div>
+                    }
+
+                    {state.showCreateWallet &&
+                      <div className='text-color-warning'>
+                        {createWalletText ?? "Please create or restore a wallet first!"}
+                      </div>}
+                    {state.showFundAccount &&
+                      <div className='text-color-warning'>
+                        {fundAccountText ?? "Your account does not exist, visit thefaucet to fund your account"}
+                        <div className='pt-4'>
+                          <a className='btn btn-accent'
+                            href="https://faucet.minaprotocol.com/" target="_blank" rel="noreferrer">Faucet</a></div>
+                      </div>
+                    }
 
 
 
+
+                  </div>
+                </div>
+
+                <div className='pt-20'>
+                  <span className="loading loading-bars loading-lg"></span>
 
                 </div>
               </div>
-
-              <div className='pt-20'>
-                <span className="loading loading-bars loading-lg"></span>
-
-              </div>
-            </div>
+            }
           </div>
+        </div>
 
         :
         <div>

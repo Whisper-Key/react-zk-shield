@@ -7,11 +7,14 @@ import { WalletTransactionResult } from "../WalletTransactionResult.js";
 
 export class AuroWalletProvider implements IWalletProvider {
     name: string = "AuroWallet";
+    description: string = "Auro Wallet Provider";
     mina: any;
 
     constructor(mina: any) {
         this.mina = mina;
+        console.log("AuroWalletProvider.constructor", mina);
     }
+
     async sendZkTransaction(json: string, fee: number, memo: string): Promise<WalletTransactionResult> {
         try {
             const { hash } = await this.mina.sendTransaction({
