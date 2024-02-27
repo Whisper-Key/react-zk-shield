@@ -7,7 +7,7 @@ import { WalletTransactionResult } from "../WalletTransactionResult.js";
 import { ChainSelectedResult } from "../ChainSelectedResult.js";
 
 export class AuroWalletProvider implements IWalletProvider {
-    name: string = "AuroWallet";
+    name: string = "Auro Wallet";
     description: string = "Auro Wallet Provider";
     mina: any;
 

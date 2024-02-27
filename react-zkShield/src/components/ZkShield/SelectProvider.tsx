@@ -38,9 +38,9 @@ const SelectProvider: React.FC<SelectProviderProps> = ({ providerSelectedHandler
             <h1>Select Wallet Provider</h1>
             <ul>
                 {state.providersLoaded && state.providers!.map((provider) => (
-                    <li key={provider.name}>
-                        {provider.name} - {provider.description}
-                        <button onClick={() => connectProvider(provider) }>Connect to {provider.name}</button>
+                    <li key={provider.name} style={{ cursor: "pointer"}} onClick={() => connectProvider(provider) }>
+                        <span title={provider.description}>{provider.name}</span>
+                        {/* <button onClick={() => connectProvider(provider) }>Connect to {provider.name}</button> */}
                     </li>
                 ))}
             </ul>

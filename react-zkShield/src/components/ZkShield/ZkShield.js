@@ -26,8 +26,12 @@ const ZkShield = ({
   requestingAccountText,
   fundAccountText,
   ignoreConnectForTesting,
-  minaWalletProvider,
+  minaWalletProvider, 
+  autoLaunch,
+  selectNetworkClassName,
+  selectProviderClassName,
   children }) => {
+    
 
   let [state, setState] = useState({
     authentication: null,
@@ -48,6 +52,7 @@ const ZkShield = ({
     providerSelected: false,
     networkSelected: false,
     network: null,
+    launch: true
   });
 
   let [authState, setAuthState] = useState({
@@ -58,6 +63,7 @@ const ZkShield = ({
     alertMessage: '',
     alertNeedsSpinner: false,
     creator: null,
+    connectedNetwork:'',
   });
 
   const [userAuthenticated, setUserAuthenticated] = useState(false);
@@ -74,12 +80,19 @@ const ZkShield = ({
 
   useEffect(() => {
 
+    window.zkshield = {
+      launch: () => {
+        console.log("launching");
+        setState({ ...state, launch: true });
+      }
+    };
 
-
+    const launchState = autoLaunch ?? state.launch;
+    setState({ ...state, launch: launchState });
 
     (async () => {
 
-      if (minaWalletProvider) {
+      if (autoLaunch && minaWalletProvider) {
         const network = new NetworkWorkerClient();
         const walletProvider = minaWalletProvider ?? new AuroWalletProvider(window.mina);
         const authentication = new Authentication(walletProvider, network);
@@ -108,11 +121,11 @@ const ZkShield = ({
         const hasWallet = await authentication.checkForWallet();
         console.log("hasWallet", hasWallet);
         if (!hasWallet) {
-          setState({ ...state, hasWallet: false, snarkyLoaded: true });
+          setState({ ...state, hasWallet: false, snarkyLoaded: true, providerSelected: true });
           return;
         }
         else {
-          setState({ ...state, hasWallet: true, snarkyLoaded: true, showRequestingAccount: true });
+          setState({ ...state, hasWallet: true, snarkyLoaded: true, showRequestingAccount: true, providerSelected: true });
           console.log("has wallet");
         }
         console.log("requesting account");
@@ -121,22 +134,22 @@ const ZkShield = ({
 
         if (!loginResult.connected) {
           console.log(loginResult.friendlyErrorMessage);
-          setState({ ...state, showCreateWallet: true, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
+          setState({ ...state, showCreateWallet: true, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, providerSelected: true });
         }
 
         console.log("checking account");
         const accountExists = await authentication.doesAccountExist();
         if (!accountExists) {
-          setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false });
+          setState({ ...state, showFundAccount: true, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, providerSelected: true });
         }
         else {
-          setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: true });
+          setState({ ...state, showLoadingContracts: true, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: true, providerSelected: true });
           const hasBeenSetup = true;
           setUserAuthenticated(true);
           setUserAddress(authentication.address);
-          setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication });
+          setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication, providerSelected: true });
 
-          setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address, firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in' });
+          setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address, firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in', connectedNetwork: state.network });
 
         }
 
@@ -164,15 +177,23 @@ const ZkShield = ({
     <>
 
 
-      {!state.hasBeenSetup ?
+      {state.launch && !state.hasBeenSetup ?
 
 
-        <div className={mainContainerClassName ?? "shield-main-container"}>
-          <div className={innerContainerClassName ?? "shield-inner-container"}>
+        <div className={mainContainerClassName ?? "zkshield-main-container"}>
+          <div className={innerContainerClassName ?? "zkshield-inner-container"}>
             {minaWalletProvider == null && !state.providerSelected && 
             <div>
-            <SelectNetwork networkSelectedHandler={networkSelected} />
-            {state.networkSelected && <SelectProvider providerSelectedHandler={providerSelected} /> }
+            {!state.networkSelected && 
+              <div className={selectNetworkClassName ?? "zkshield-select-network-container"}>
+                <SelectNetwork networkSelectedHandler={networkSelected} /> 
+              </div>
+            }
+            {state.networkSelected && 
+              <div className={selectProviderClassName ?? "zkshield-select-provider-container"}>
+                <SelectProvider providerSelectedHandler={providerSelected} /> 
+              </div>
+            }
             </div>
             }
             {state.providerSelected &&
@@ -240,6 +261,8 @@ const ZkShield = ({
 ZkShield.propTypes = {
   mainContainerClassName: PropTypes.string,
   innerContainerClassName: PropTypes.string,
+  selectNetworkClassName: PropTypes.string,
+  selectProviderClassName: PropTypes.string,
   headerClassName: PropTypes.string,
   headerText: PropTypes.string,
   statusClassName: PropTypes.string,
@@ -248,6 +271,7 @@ ZkShield.propTypes = {
   requestingAccountText: PropTypes.string,
   fundAccountText: PropTypes.string,
   ignoreConnectForTesting: PropTypes.bool,
+  autoLaunch: PropTypes.bool,
   children: PropTypes.node.isRequired,
   minaWalletProvider: PropTypes.object
 };

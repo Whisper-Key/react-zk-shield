@@ -16,10 +16,8 @@ const SelectNetwork: React.FC<SelectNetworkProps> = ({ networkSelectedHandler })
         networks: null,
     });
 
-    const supportedNetworks = ["local", "mainnet",
-    "devnet",
-    "berkeley",
-    "testworld2"];
+    // how do we tie these to supported network classes?
+    const supportedNetworks = ["local", "berkeley"];
 
     const networkChanged = (event: any) => {
         console.log("SelectNetwork.networkChanged", event.target.value);
@@ -30,12 +28,15 @@ const SelectNetwork: React.FC<SelectNetworkProps> = ({ networkSelectedHandler })
             <h1>Select Network</h1>
             <select onChange={networkChanged}>
                 <option>Select a network</option>
-
+                
                 {supportedNetworks.map((network) => (
                     <option key={network}>
                         {network}
                     </option>
                 ))}
+                <option disabled>mainnet</option>
+                <option disabled>devnet</option>
+                <option disabled>testworld2</option>
             </select>
         </div>
     );

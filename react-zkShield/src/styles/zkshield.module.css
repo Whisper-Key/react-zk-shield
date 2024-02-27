@@ -1,0 +1,38 @@
+.zkshield-main-container {
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    padding: 5rem;
+    min-height: 100vh;
+  }
+  
+  .zkshield-inner-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 6rem 0;
+  }
+
+.zkshield-select-network-container {
+    background-color: azure;
+}
+
+.zkshield-select-provider-container {
+    background-color: beige;
+}
+.zkshield-select-provider-container ul {
+    list-style-type: none;
+}
+.zkshield-select-provider-container ul li {
+    list-style-type: none;
+    margin: 20px 0 20px 0;
+    padding: 20px 10px 20px 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    cursor: pointer;
+}
+

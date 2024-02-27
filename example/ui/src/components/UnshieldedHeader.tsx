@@ -6,16 +6,20 @@ import { AuthContext } from "zkshield";
 import React from 'react';
 import Router from 'next/router';
 
-const ShieldedHeading = () => {
+
+const UnshieldedHeader = () => {
   const [authState, setAuthState] = useContext(AuthContext);
   console.log("authState", authState);
 
   return (
     <>
-    <div>
-      <h1>{authState.userAuthenticated && <> Connected as {authState.userAddress} on network {authState.connectedNetwork} </> }</h1>
-      <h1>{!authState.userAuthenticated && "Not connected to a wallet!" }</h1>
+  {!authState.userAuthenticated &&   <div>
+      
+      {!authState.userAuthenticated &&
+      <button onClick={() => (window as any).zkshield.launch()}>Connect wallet</button>
+}
     </div>
+}
     </>  );
 }
-export default ShieldedHeading;
+export default UnshieldedHeader;

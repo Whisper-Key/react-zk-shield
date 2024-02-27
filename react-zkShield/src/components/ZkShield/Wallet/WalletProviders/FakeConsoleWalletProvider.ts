@@ -5,7 +5,7 @@ import { WalletConnectResult } from "../WalletConnectResult.js";
 import { WalletTransactionResult } from "../WalletTransactionResult.js";
 
 export class FakeConsoleWalletProvider implements IWalletProvider {
-    name: string = "FakeConsoleWalletProvider";
+    name: string = "Fake Console Wallet";
     description: string = "Fake Console Wallet Provider";
     walletFound: boolean = false;
     connectResult: WalletConnectResult = new WalletConnectResult(false, "", "", "", "");

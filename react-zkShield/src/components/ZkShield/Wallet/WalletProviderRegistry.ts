@@ -17,8 +17,7 @@ export class WalletProviderRegistry {
         // is there reflection, can decorators help?
 
         // for now, just hardcode the providers
-         return [new FakeConsoleWalletProvider(true, new WalletConnectResult(true, "0x123", "", "", ""), new WalletTransactionResult(true, "", "", "", "", ""), new SignedMessageResult(true, "", "", "", "", "")),
-        new AuroWalletProvider(this.auroWalletLib)];
+         return [new AuroWalletProvider(this.auroWalletLib), new FakeConsoleWalletProvider(true, new WalletConnectResult(true, "0x123", "", "", ""), new WalletTransactionResult(true, "", "", "", "", ""), new SignedMessageResult(true, "", "", "", "", ""))];
     }
 
 }
