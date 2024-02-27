@@ -1,6 +1,6 @@
 {
   "name": "zkshield",
-  "version": "0.2.31",
+  "version": "0.2.35",
   "description": "A react component for authenticating SPAs using Mina",
   "type": "module",
   "main": "dist/src/index.js",

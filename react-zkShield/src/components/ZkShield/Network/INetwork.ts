@@ -9,25 +9,28 @@ export interface INetwork {
     fetchUserAccount(publicKey: string): any;
 }
 
-export type networks = "LocalBlockchain" | "Berkeley" | "Mainnet" | "Testnet" | "Custom";
+export type supportedNetwork = "local" | "berkeley" | "mainnet" | "testworld2" | "custom";
 
 export class NetworkFactory {
-    static createNetwork(network?: networks): INetwork {
+    static get(network: supportedNetwork) {
+        throw new Error('Method not implemented.');
+    }
+    static createNetwork(network?: supportedNetwork): INetwork {
 
         if (!network) {
-            network = process.env.REACT_APP_NETWORK as networks || "LocalBlockchain";
+            network = process.env.REACT_APP_NETWORK as supportedNetwork || "local";
             console.log("connecting to local blockchain...");
         }
 
         switch (network) {
-            case "LocalBlockchain":
+            case "local":
                 return new LocalBlockchain();
-            case "Berkeley":
-                return new RemoteBlockchain("Berkeley", true, "https://proxy.berkeley.minaexplorer.com/graphql", "https://archive.berkeley.minaexplorer.com/");
-            case "Mainnet":
-                return new RemoteBlockchain("Mainnet", true, "https://minaprotocol.com", "https://minaprotocol.com");
-            case "Testnet":
-                return new RemoteBlockchain("Testnet", true, "https://proxy.berkeley.minaexplorer.com/graphql", "https://archive.berkeley.minaexplorer.com/");
+            case "berkeley":
+                return new RemoteBlockchain("berkeley", true, "https://proxy.berkeley.minaexplorer.com/graphql", "https://archive.berkeley.minaexplorer.com/");
+            case "mainnet":
+                return new RemoteBlockchain("mainnet", true, "https://minaprotocol.com", "https://minaprotocol.com");
+            case "testworld2":
+                return new RemoteBlockchain("testworld2", true, "https://proxy.berkeley.minaexplorer.com/graphql", "https://archive.berkeley.minaexplorer.com/");
             default:
                 throw new Error("Invalid network");
         }

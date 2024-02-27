@@ -4,6 +4,7 @@ import { WalletConnectResult } from "../WalletConnectResult.js";
 import { WalletAccount } from "../WalletAccount.js";
 import { SignedMessageResult } from "../SignedMessageResult.js";
 import { WalletTransactionResult } from "../WalletTransactionResult.js";
+import { ChainSelectedResult } from "../ChainSelectedResult.js";
 
 export class AuroWalletProvider implements IWalletProvider {
     name: string = "AuroWallet";
@@ -13,6 +14,16 @@ export class AuroWalletProvider implements IWalletProvider {
     constructor(mina: any) {
         this.mina = mina;
         console.log("AuroWalletProvider.constructor", mina);
+    }
+    async selectChain(chainID: string): Promise<ChainSelectedResult> {
+        try {
+            await this.mina.switchChain({chainId: chainID.trim(),});
+            console.log("AuroWalletProvider.selectChain", chainID);
+            return Promise.resolve(new ChainSelectedResult(true, chainID, "", "", "", ""));
+        } catch (e: any) {
+            console.log("AuroWalletProvider.selectChain", e);
+            return Promise.resolve(new ChainSelectedResult(false, chainID, e.code, e.message, e.message, e.data));
+        }
     }
 
     async sendZkTransaction(json: string, fee: number, memo: string): Promise<WalletTransactionResult> {

@@ -22,8 +22,8 @@ export default class NetworkWorkerClient {
      return this._call('loado1js', {});
     }
 
-    setupActiveInstance() {
-     return this._call('setActiveInstance', {});
+    setupActiveInstance(network: string) {
+     return this._call('setActiveInstance', { network });
     }
 
     fetchUserAccount(publicKey58: string) {

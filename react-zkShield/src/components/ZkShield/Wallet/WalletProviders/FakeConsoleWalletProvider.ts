@@ -1,3 +1,4 @@
+import { ChainSelectedResult } from "../ChainSelectedResult.js";
 import { IWalletProvider } from "../IWalletProvider.js";
 import { SignedMessageResult } from "../SignedMessageResult.js";
 import { WalletConnectResult } from "../WalletConnectResult.js";
@@ -16,6 +17,10 @@ export class FakeConsoleWalletProvider implements IWalletProvider {
         this.connectResult = connectResult;
         this.sendZkTransactionResult = sendZkTransactionResult;
         this.signMessageResult = signMessageResult;
+    }
+    selectChain(chainID: string): Promise<ChainSelectedResult> {
+        console.log("FakeConsoleWalletProvider.selectChain", chainID);
+        return Promise.resolve(new ChainSelectedResult(true, chainID, "", "", "", ""));
     }
 
     hasWallet(): boolean {

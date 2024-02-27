@@ -11,16 +11,18 @@ import {
     AccountUpdate,
 } from 'o1js'
 import { NewLineKind } from 'typescript';
-import { NetworkFactory } from './INetwork.js';
+import { INetwork, NetworkFactory, supportedNetwork } from './INetwork.js';
 
 
-const network = NetworkFactory.createNetwork();
+let  network:INetwork;
+
 const functions = {
     loado1js: async (args: {}) => {
         await isReady;
     },
-    setActiveInstance: async (args: {}) => {
-        network.setActiveInstance();
+    setActiveInstance: async (args: {network: supportedNetwork}) => {
+        console.log('setActiveInstance', args.network);
+       network =  NetworkFactory.createNetwork(args.network);
     },
 
     fetchUserAccount: async (args: { publicKey58: string }) => {

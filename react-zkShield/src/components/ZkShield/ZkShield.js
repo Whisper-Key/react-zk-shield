@@ -12,7 +12,7 @@ import {
   PrivateKey,
   Field,
 } from 'o1js'
-
+import SelectNetwork from './SelectNetwork.js';
 
 const AuthContext = createContext();
 const ZkShield = ({
@@ -46,6 +46,8 @@ const ZkShield = ({
     userAddress: null,
     authentication: null,
     providerSelected: false,
+    networkSelected: false,
+    network: null,
   });
 
   let [authState, setAuthState] = useState({
@@ -97,7 +99,7 @@ const ZkShield = ({
         await timeout(5);
         console.log("loading snarky");
         try {
-          const loadedSnarky = await authentication.loadO1js();
+          const loadedSnarky = await authentication.loadO1js(state.network);
         } catch (e) {
           console.log("error loading snarky", e);
         }
@@ -152,6 +154,11 @@ const ZkShield = ({
     await providerSetup(authentication);
   }
 
+  const networkSelected = async (network) => {
+    console.log("network selected in ZK Shield", network);
+    setState({ ...state, networkSelected: true, network: network });
+  }
+
 
   return (
     <>
@@ -162,7 +169,12 @@ const ZkShield = ({
 
         <div className={mainContainerClassName ?? "shield-main-container"}>
           <div className={innerContainerClassName ?? "shield-inner-container"}>
-            {minaWalletProvider == null && !state.providerSelected && <SelectProvider providerSelectedHandler={providerSelected} />}
+            {minaWalletProvider == null && !state.providerSelected && 
+            <div>
+            <SelectNetwork networkSelectedHandler={networkSelected} />
+            {state.networkSelected && <SelectProvider providerSelectedHandler={providerSelected} /> }
+            </div>
+            }
             {state.providerSelected &&
               <div>
                 <h1 className={headerClassName ?? ""}>{headerText ?? "Getting things ready"}</h1>
