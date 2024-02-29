@@ -3,13 +3,16 @@ import { SignedMessageResult } from "./SignedMessageResult.js";
 import { WalletConnectResult } from "./WalletConnectResult.js";
 import { AuroWalletProvider } from "./WalletProviders/AuroWalletProvider.js";
 import { FakeConsoleWalletProvider } from "./WalletProviders/FakeConsoleWalletProvider.js";
+import { LocalInjectedWallet } from "./WalletProviders/LocalInjectedWallet.js";
 import { WalletTransactionResult } from "./WalletTransactionResult.js";
 
 export class WalletProviderRegistry {
     supportedProviders: IWalletProvider[] = [];
     auroWalletLib: any;
-    constructor(auroWalletLib: any) {
+    network: string;
+    constructor(auroWalletLib: any, network: string) {
         this.auroWalletLib = auroWalletLib;
+        this.network = network;
         this.supportedProviders = this.getProviderInstances();
     }
     getProviderInstances(): IWalletProvider[] {
@@ -17,7 +20,12 @@ export class WalletProviderRegistry {
         // is there reflection, can decorators help?
 
         // for now, just hardcode the providers
-         return [new AuroWalletProvider(this.auroWalletLib), new FakeConsoleWalletProvider(true, new WalletConnectResult(true, "0x123", "", "", ""), new WalletTransactionResult(true, "", "", "", "", ""), new SignedMessageResult(true, "", "", "", "", ""))];
+        console.log("WalletProviderRegistry.network", this.network);
+        if (this.network === "local") {
+            return [new LocalInjectedWallet()];
+        } else {
+            return [new AuroWalletProvider(this.auroWalletLib), new FakeConsoleWalletProvider(true, new WalletConnectResult(true, "0x123", "", "", ""), new WalletTransactionResult(true, "", "", "", "", ""), new SignedMessageResult(true, "", "", "", "", ""))];
+        }
     }
 
 }

@@ -30,9 +30,9 @@ export class Authentication {
         this.fundAccount = false;
     }
 
-    async loadO1js(network: string): Promise<boolean> {
+    async loadO1js(network: string, localAccounts?: string[]): Promise<boolean> {
         await this.networkClient.loado1js();
-        await this.networkClient.setupActiveInstance(network);
+        await this.networkClient.setupActiveInstance(network, localAccounts);
         await this.walletProvider.selectChain(network);
         this.o1jsLoaded = true;
         return true;

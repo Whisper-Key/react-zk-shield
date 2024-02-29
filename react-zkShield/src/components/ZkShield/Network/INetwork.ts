@@ -1,6 +1,9 @@
 import { LocalBlockchain } from "./LocalBlockchain.js";
 import { RemoteBlockchain } from "./RemoteBlockchain.js";
 
+import {
+    PublicKey,
+} from 'o1js'
 export interface INetwork {
     name: string;
     useProofs: boolean;
@@ -15,16 +18,15 @@ export class NetworkFactory {
     static get(network: supportedNetwork) {
         throw new Error('Method not implemented.');
     }
-    static createNetwork(network?: supportedNetwork): INetwork {
+    static createNetwork(network?: supportedNetwork, localAccounts?: string[]): INetwork {
 
         if (!network) {
             network = process.env.REACT_APP_NETWORK as supportedNetwork || "local";
             console.log("connecting to local blockchain...");
         }
-
         switch (network) {
             case "local":
-                return new LocalBlockchain();
+                return new LocalBlockchain(localAccounts);
             case "berkeley":
                 return new RemoteBlockchain("berkeley", true, "https://proxy.berkeley.minaexplorer.com/graphql", "https://archive.berkeley.minaexplorer.com/");
             case "mainnet":

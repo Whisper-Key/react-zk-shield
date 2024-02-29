@@ -14,6 +14,8 @@ import ShieldedHeading from '@/components/ShieldedHeading';
 
 export default function Home() {
 
+  const acc = "B62qoQDqsgFc7aEToXe4wjxTeNCeNmzESXFiPd3sYs1MD7oZbyiPYEg";
+  console.log("local account", acc);
 
   return (
     <>
@@ -24,7 +26,10 @@ export default function Home() {
       </Head>
       <GradientBG>
       <ZkShield  mainContainerClassName={styles.main} 
-                innerContainerClassName={styles.center} headerText={"Loading things"} ignoreConnectForTesting={false}>
+                innerContainerClassName={styles.center} 
+                headerText={"Loading things"} 
+                ignoreConnectForTesting={false}
+                localAccounts={[acc]}>
         <ShieldedHeading />
           <main className={styles.main}>
             <div className={styles.center}>

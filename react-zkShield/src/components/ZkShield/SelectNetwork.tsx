@@ -1,5 +1,4 @@
 import { IWalletProvider } from "./Wallet/IWalletProvider.js";
-import { WalletProviderRegistry } from "./Wallet/WalletProviderRegistry.js";
 import { useState, useEffect } from 'react';
 import React from "react";
 export interface SelectNetworkProps {

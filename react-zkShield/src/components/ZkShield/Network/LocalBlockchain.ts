@@ -10,27 +10,38 @@ export class LocalBlockchain implements INetwork {
     name: string;
     useProofs: boolean;
     blockchain: any;
-    constructor() {
+    attachAccounts?: string[];
+
+    constructor(attachAccounts?: string[]) {
         this.name = "LocalBlockchain";
         this.useProofs = false;
+        this.attachAccounts = attachAccounts;
     }
 
     setActiveInstance() {
         this.blockchain = Mina.LocalBlockchain({ proofsEnabled: this.useProofs });
         Mina.setActiveInstance(this.blockchain);
+        console.log("attaching accounts", this.attachAccounts);
 
+        if (this.attachAccounts) {
+
+            for (let i = 0; i < this.attachAccounts.length; i++) {
+                const account = this.attachAccounts[i];
+                console.log("attaching account: ", account);
+                this.attachAccount(account);
+                console.log("attached account: ", account);
+            }
+        }
     }
 
     async fetchUserAccount(publicKey: string) {
         console.log("no fetching we are using local blockchain");
-      return {error:null};
-      
+        return { error: null };
+
     }
 
-    attachAccount(privateKey: string) {
-        const accountKey = PrivateKey.fromBase58(privateKey);
-        const account = accountKey.toPublicKey();
-        this.blockchain.addAccount(account, '10_000_000_000');
+    attachAccount(account: string) {
+        this.blockchain.addAccount(PublicKey.fromBase58(account), '10_000_000_000');
     }
 
 }
