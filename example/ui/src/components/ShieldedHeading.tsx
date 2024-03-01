@@ -18,7 +18,7 @@ const ShieldedHeading = () => {
 }
   return (
     <>
-    <div style={{textAlign: "center"}}>
+    <div style={{textAlign: "center", marginTop: "20px"}}>
     {authState.userAuthenticated && <>
       <h1> Connected as {shortenAddress(authState.userAddress)} </h1>
       <h3>on network - {authState.connectedNetwork} </h3>

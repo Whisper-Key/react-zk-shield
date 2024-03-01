@@ -8,29 +8,25 @@ import { ZkShield } from 'zkshield';
 import UnshieldedHeader from "@/components/UnshieldedHeader";
 import React from 'react';
 import ShieldedHeading from '@/components/ShieldedHeading';
-// import { WalletImage } from '../modules/WalletImage.js';
 
 export default function Home() {
 
   return (
     <>
-      <div id="zkshield-connect">
+      
       <GradientBG>
-      <UnshieldedHeader />
+      <UnshieldedHeader showConnect={true} />
 
       <ZkShield  mainContainerClassName={styles.main} 
                 innerContainerClassName={styles.center} 
-                selectNetworkClassName={styles.selectNetworkContainer}
-                selectProviderClassName={styles.selectProviderContainer}
                 headerText={"Loading things"} 
                 ignoreConnectForTesting={false}
-                >
+                autoLaunch={false}>
 
         <ShieldedHeading />
             
         </ZkShield>
       </GradientBG>
-      </div>
     </>
   );
 }
