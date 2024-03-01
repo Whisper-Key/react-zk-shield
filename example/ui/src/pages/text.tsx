@@ -9,8 +9,12 @@ export default function CssTest() {
     return (
         <>
             <GradientBG>
-                <UnshieldedHeader showConnect={true} />
+                <UnshieldedHeader showConnect={false} />
                 <ZkShield
+                    mainContainerClassName={styles.main} 
+                    innerContainerClassName={styles.center} 
+                    selectNetworkClassName={styles.selectNetworkContainer}
+                    selectProviderClassName={styles.selectProviderContainer}
                     headerText={"Loading things"}
                     walletNotFoundText={"Where's your wallet?"}
                     createWalletText={"You should create a wallet"}

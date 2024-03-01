@@ -19,6 +19,8 @@ export default function Home() {
 
       <ZkShield  mainContainerClassName={styles.main} 
                 innerContainerClassName={styles.center} 
+                selectNetworkClassName={styles.selectNetworkContainer}
+                selectProviderClassName={styles.selectProviderContainer}
                 headerText={"Loading things"} 
                 ignoreConnectForTesting={false}
                 autoLaunch={false}>
