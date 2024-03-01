@@ -6,6 +6,7 @@ import { AuthContext } from "zkshield";
 import React from 'react';
 import Router from 'next/router';
 import styles from '../styles/Home.module.css';
+import Link from 'next/link';
 
 export interface UnshieldedHeaderProps {
   showConnect?: boolean;
@@ -15,13 +16,13 @@ const UnshieldedHeader: React.FC<UnshieldedHeaderProps> = ({ showConnect }) => {
   return (
     <>
       <div className={styles.header}>
-        <a href="/" className={styles.logo}>ZK Shield</a>
+      <Link href="/" className={styles.logo}>ZK Shield</Link>
         <div className={styles["header-right"]}>
-          <a  href="/disableconnect">Disable Connect</a>
-          <a href="/launch">Launch</a>
-          <a href="/style">Style</a>
-          <a href="/text">Text</a>
-          {showConnect && <a href="#" className={styles.active} onClick={() => (window as any).zkshield.launch()}>Connect wallet</a>}
+          <Link  href="/disableconnect">Disable Connect</Link>
+          <Link href="/launch">Launch</Link>
+          <Link href="/style">Style</Link>
+          <Link href="/text">Text</Link>
+          {showConnect &&  <Link href="#" className={styles.active} onClick={() => (window as any).zkshield.launch()}>Connect wallet</Link>}
         </div>
       </div>
 
