@@ -1,4 +1,4 @@
-import { NetworkFactory } from "./INetwork.js";
+import { NetworkFactory, supportedNetwork } from "./INetwork.js";
 import { NetworkWorkerFunctions, NetworkWorkerReponse, NetworkWorkerRequest } from "./NetworkWorker.js";
 
 export default class NetworkWorkerClient {
@@ -22,7 +22,7 @@ export default class NetworkWorkerClient {
      return this._call('loado1js', {});
     }
 
-    setupActiveInstance(network: string, localAccounts?: string[]) {
+    setupActiveInstance(network: supportedNetwork, localAccounts?: string[]) {
      return this._call('setActiveInstance', { network, localAccounts});
     }
 

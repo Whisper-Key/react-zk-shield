@@ -160,9 +160,8 @@ const ZkShield = ({
 
   const providerSelected = async (provider) => {
     console.log("provider selected in ZK Shield", provider);
-    const network = new NetworkWorkerClient();
     const walletProvider = provider ?? new AuroWalletProvider(window.mina);
-    const authentication = new Authentication(walletProvider, network);
+    const authentication = new Authentication(walletProvider, state.network);
     setState({ ...state, providerSelected: true });
 
     await providerSetup(authentication);
@@ -192,7 +191,7 @@ const ZkShield = ({
             }
             {state.networkSelected && 
               <div className={selectProviderClassName ?? "zkshield-select-provider-container"}>
-                <SelectProvider network={state.network} providerSelectedHandler={providerSelected} /> 
+                <SelectProvider network={state.network} localAccounts={localAccounts} providerSelectedHandler={providerSelected} /> 
               </div>
             }
             </div>

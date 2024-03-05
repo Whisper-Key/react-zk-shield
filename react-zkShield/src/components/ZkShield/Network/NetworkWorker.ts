@@ -10,7 +10,6 @@ import {
     Bool,
     AccountUpdate,
 } from 'o1js'
-import { NewLineKind } from 'typescript';
 import { INetwork, NetworkFactory, supportedNetwork } from './INetwork.js';
 
 
@@ -24,6 +23,7 @@ const functions = {
         console.log('setActiveInstance', args.network);
         network = NetworkFactory.createNetwork(args.network, args.localAccounts);
         network.setActiveInstance();
+
     },
 
     fetchUserAccount: async (args: { publicKey58: string }) => {

@@ -1,10 +1,10 @@
 import { get } from "http";
 import { IWalletProvider } from "../IWalletProvider.js";
-import { WalletConnectResult } from "../WalletConnectResult.js";
 import { WalletAccount } from "../WalletAccount.js";
 import { SignedMessageResult } from "../SignedMessageResult.js";
 import { WalletTransactionResult } from "../WalletTransactionResult.js";
 import { ChainSelectedResult } from "../ChainSelectedResult.js";
+import { WalletConnectResult } from "../WalletConnectResult.js";
 
 export class AuroWalletProvider implements IWalletProvider {
     name: string = "Auro Wallet";

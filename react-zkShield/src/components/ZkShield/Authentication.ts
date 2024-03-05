@@ -2,6 +2,7 @@ import NetworkWorkerClient from "./Network/NetworkWorkerClient.js";
 import { PublicKey } from "o1js";
 import { IWalletProvider } from "./Wallet/IWalletProvider.js";
 import { WalletConnectResult } from "./Wallet/WalletConnectResult.js";
+import { INetwork, NetworkFactory, supportedNetwork } from "./Network/INetwork.js";
 export class Authentication {
     walletProvider: IWalletProvider;
     address!: string;
@@ -14,12 +15,14 @@ export class Authentication {
     showRequestingAccount: boolean | undefined;
     showCreateWallet: boolean | undefined;
     fundAccount: boolean | undefined;
+    network: supportedNetwork;
+    activeNetworkProvider: INetwork | undefined;
 
     networkClient: NetworkWorkerClient
-    constructor(walletProvider: IWalletProvider, networkClient: NetworkWorkerClient) {
-        this.networkClient = networkClient;
+    constructor(walletProvider: IWalletProvider, network: supportedNetwork) {
+        this.network = network;
+        this.networkClient = new NetworkWorkerClient();
         this.walletProvider = walletProvider;
-        this.networkClient = networkClient;
         this.loggedIn = false;
         this.hasWallet = false;
         this.hasBeenSetup = false;
@@ -32,7 +35,9 @@ export class Authentication {
 
     async loadO1js(network: string, localAccounts?: string[]): Promise<boolean> {
         await this.networkClient.loado1js();
-        await this.networkClient.setupActiveInstance(network, localAccounts);
+        this.activeNetworkProvider = NetworkFactory.createNetwork(this.network, localAccounts);
+        console.log("activeNetworkProvider", this.activeNetworkProvider);
+        await this.networkClient.setupActiveInstance(this.network, localAccounts);
         await this.walletProvider.selectChain(network);
         this.o1jsLoaded = true;
         return true;
