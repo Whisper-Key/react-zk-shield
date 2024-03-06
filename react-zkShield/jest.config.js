@@ -9,4 +9,13 @@ export default {
     "transform": {
       "^.+\\.(ts|tsx)$": "ts-jest"
     },
+    "globals": {
+      "ts-jest": {
+        "useESM": true
+      }
+    },
+    moduleNameMapper: {
+      "(.+)\\.js": "$1"
+    },
+    extensionsToTreatAsEsm: [".ts"],
   }

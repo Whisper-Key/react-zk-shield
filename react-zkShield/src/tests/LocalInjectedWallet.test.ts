@@ -1,4 +1,4 @@
-import { LocalInjectedWallet } from "../components/ZkShield/Wallet/WalletProviders/LocalInjectedWallet";
+import { LocalInjectedWallet } from "../components/ZkShield/Wallet/WalletProviders/LocalInjectedWallet.js";
 
 describe('LocalInjectedWallet', () => {
 
@@ -34,7 +34,7 @@ describe('LocalInjectedWallet', () => {
         const result = await provider.disconnect();
         expect(result.connected).toEqual(true);
         expect(provider.connectedZkApps.length).toEqual(0);
-    }
+    })
 
 
 });
