@@ -26,7 +26,8 @@ export class AuroWalletProvider implements IWalletProvider {
         }
     }
 
-    async sendZkTransaction(json: string, fee: number, memo: string): Promise<WalletTransactionResult> {
+    async sendZkTransaction(transaction: any, fee: number, memo: string): Promise<WalletTransactionResult> {
+        const json = transaction.toJSON();
         try {
             const { hash } = await this.mina.sendTransaction({
                 transaction: json,

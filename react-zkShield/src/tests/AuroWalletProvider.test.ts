@@ -77,7 +77,8 @@ describe('AuroWalletProvider', () => {
     it('can send zk transaction', async () => {
         const mina = { sendTransaction: (j: string, f: number, m: string) => { return {hash: "hashed"}  } };
         const provider = new AuroWalletProvider(mina);
-        const result = await provider.sendZkTransaction("json", 1, "memo");
+        const transaction = { toJSON: () => { return "json" } };
+        const result = await provider.sendZkTransaction(transaction, 1, "memo");
         expect(result.succeded).toEqual(true);
         expect(result.transactionHash).toEqual("hashed");
     });
@@ -85,7 +86,8 @@ describe('AuroWalletProvider', () => {
     it('can get send zk transaction and handle error', async () => {
         const mina = { sendTransaction: (j: string, f: number, m: string) => { throw { code: "1006", message: "Send transaction error" } } };
         const provider = new AuroWalletProvider(mina);
-        const result = await provider.sendZkTransaction("json", 1, "memo");
+        const transaction = { toJSON: () => { return "json" } };
+        const result = await provider.sendZkTransaction(transaction, 1, "memo");
         expect(result.errorCode).toEqual("1006");
         expect(result.errorMessage).toEqual("Send transaction error");
         expect(result.friendlyErrorMessage).toEqual("Send transaction error");

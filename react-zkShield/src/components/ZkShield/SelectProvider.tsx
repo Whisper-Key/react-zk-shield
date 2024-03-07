@@ -5,14 +5,14 @@ import React from "react";
 export interface SelectProviderProps {
     providerSelectedHandler: any;
     network: string;
-    localAccounts: string[];
+    localAccount: string;
 }
 
   interface SelectProviderState {
     providersLoaded: boolean;
     providers: IWalletProvider[] | null;
   }
-const SelectProvider: React.FC<SelectProviderProps> = ({ providerSelectedHandler, network, localAccounts }) => {
+const SelectProvider: React.FC<SelectProviderProps> = ({ providerSelectedHandler, network, localAccount }) => {
 
     const [state, setState] = useState<SelectProviderState>({
         providersLoaded: false,
@@ -26,7 +26,7 @@ const SelectProvider: React.FC<SelectProviderProps> = ({ providerSelectedHandler
             const aurolib = (window as any).mina;
             console.log("SelectProvider.aurolib", aurolib);
             console.log("SelectProvider.network", network);
-            const registry = new WalletProviderRegistry(window, localAccounts, aurolib, network).supportedProviders;
+            const registry = new WalletProviderRegistry(window, localAccount, aurolib, network).supportedProviders;
             setState({ providersLoaded: true, providers: registry });
           
         })();

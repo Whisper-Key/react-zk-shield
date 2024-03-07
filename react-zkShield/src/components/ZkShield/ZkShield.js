@@ -28,7 +28,7 @@ const ZkShield = ({
   ignoreConnectForTesting,
   minaWalletProvider, 
   autoLaunch,
-  localAccounts,
+  localAccount,
   selectNetworkClassName,
   selectProviderClassName,
   children }) => {
@@ -113,7 +113,7 @@ const ZkShield = ({
         await timeout(5);
         console.log("loading snarky");
         try {
-          const loadedSnarky = await authentication.loadO1js(state.network, localAccounts);
+          const loadedSnarky = await authentication.loadO1js(state.network, localAccount);
         } catch (e) {
           console.log("error loading snarky", e);
         }
@@ -191,7 +191,7 @@ const ZkShield = ({
             }
             {state.networkSelected && 
               <div className={selectProviderClassName ?? "zkshield-select-provider-container"}>
-                <SelectProvider network={state.network} localAccounts={localAccounts} providerSelectedHandler={providerSelected} /> 
+                <SelectProvider network={state.network} localAccount={localAccount} providerSelectedHandler={providerSelected} /> 
               </div>
             }
             </div>
@@ -272,7 +272,7 @@ ZkShield.propTypes = {
   fundAccountText: PropTypes.string,
   ignoreConnectForTesting: PropTypes.bool,
   autoLaunch: PropTypes.bool,
-  localAccounts: PropTypes.array,
+  localAccount: PropTypes.string,
   children: PropTypes.node.isRequired,
   minaWalletProvider: PropTypes.object
 };

@@ -18,7 +18,7 @@ export class NetworkFactory {
     static get(network: supportedNetwork) {
         throw new Error('Method not implemented.');
     }
-    static createNetwork(network?: supportedNetwork, localAccounts?: string[]): INetwork {
+    static createNetwork(network?: supportedNetwork, localAccount?: string): INetwork {
 
         if (!network) {
             network = process.env.REACT_APP_NETWORK as supportedNetwork || "local";
@@ -26,7 +26,7 @@ export class NetworkFactory {
         }
         switch (network) {
             case "local":
-                return new LocalBlockchain(localAccounts);
+                return new LocalBlockchain(localAccount);
             case "berkeley":
                 return new RemoteBlockchain("berkeley", true, "https://proxy.berkeley.minaexplorer.com/graphql", "https://archive.berkeley.minaexplorer.com/");
             case "mainnet":

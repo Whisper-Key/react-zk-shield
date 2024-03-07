@@ -8,10 +8,11 @@ import { ZkShield } from 'zkshield';
 import UnshieldedHeader from "@/components/UnshieldedHeader";
 import React from 'react';
 import ShieldedHeading from '@/components/ShieldedHeading';
+import { PrivateKey } from 'o1js';
 // import { WalletImage } from '../modules/WalletImage.js';
 
 export default function Home() {
-
+  const privateKey = PrivateKey.random();
   return (
     <>
       <div id="zkshield-connect">
@@ -24,6 +25,7 @@ export default function Home() {
                 selectProviderClassName={styles.selectProviderContainer}
                 headerText={"Loading things"} 
                 ignoreConnectForTesting={false}
+                localAccount={privateKey.toBase58()}
                 >
 
         <ShieldedHeading />

@@ -19,9 +19,10 @@ const functions = {
     loado1js: async (args: {}) => {
         await isReady;
     },
-    setActiveInstance: async (args: { network: supportedNetwork, localAccounts: string[] }) => {
+    setActiveInstance: async (args: { network: supportedNetwork, localAccount: string }) => {
         console.log('setActiveInstance', args.network);
-        network = NetworkFactory.createNetwork(args.network, args.localAccounts);
+        console.log('setActiveInstance local account', args.localAccount);
+        network = NetworkFactory.createNetwork(args.network, args.localAccount);
         network.setActiveInstance();
 
     },

@@ -10,7 +10,7 @@ export interface IWalletProvider {
     description: string;
     hasWallet(): boolean;
     connect(): Promise<WalletConnectResult>;
-    sendZkTransaction(json: string, fee: number, memo: string) : Promise<WalletTransactionResult>;
+    sendZkTransaction(transaction: any, fee: number, memo: string) : Promise<WalletTransactionResult>;
     signMessage(message: string) : Promise<SignedMessageResult>;
     selectChain(chainID: string): Promise<ChainSelectedResult>;
 }
