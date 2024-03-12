@@ -2,9 +2,9 @@ import { Authentication } from './Authentication.js';
 import SelectProvider from './SelectProvider.js';
 import NetworkWorkerClient from './Network/NetworkWorkerClient.js';
 import { AuroWalletProvider } from './Wallet/WalletProviders/AuroWalletProvider.js';
-import { useEffect, useState, createContext } from "react";
+import { useEffect, useState, createContext, useRef } from "react";
 import React from 'react';
-
+import LocalInjectedWalletUI from './LocalInjectedWalletUI.js';
 import PropTypes from 'prop-types';
 
 import {
@@ -70,6 +70,7 @@ const ZkShield = ({
   const [userAuthenticated, setUserAuthenticated] = useState(false);
   const [userAddress, setUserAddress] = useState('');
   const [firstFetchAccount, setFirstFetchAccount] = useState(false);
+  const injectedWalletRef = useRef(null);
 
   function timeout(seconds) {
     return new Promise(function (resolve) {
@@ -162,6 +163,7 @@ const ZkShield = ({
     console.log("provider selected in ZK Shield", provider);
     const walletProvider = provider ?? new AuroWalletProvider(window.mina);
     const authentication = new Authentication(walletProvider, state.network);
+    window.zkshield.walletProvider = walletProvider;
     setState({ ...state, providerSelected: true });
 
     await providerSetup(authentication);
@@ -170,16 +172,22 @@ const ZkShield = ({
   const networkSelected = async (network) => {
     console.log("network selected in ZK Shield", network);
     setState({ ...state, networkSelected: true, network: network });
+
+    if (network == "local" && injectedWalletRef.current) {
+      console.log("toggling wallet");
+      injectedWalletRef.current.toggleWallet();
+    }
   }
 
 
   return (
     <>
 
+     {state.networkSelected && <LocalInjectedWalletUI ref={injectedWalletRef} /> }
+
 
       {state.launch && !state.hasBeenSetup ?
-
-
+        
         <div className={mainContainerClassName ?? "zkshield-main-container"}>
           <div className={innerContainerClassName ?? "zkshield-inner-container"}>
             {minaWalletProvider == null && !state.providerSelected && 
@@ -249,7 +257,11 @@ const ZkShield = ({
           <AuthContext.Provider value={[authState, setAuthState]}>
             {children}
           </AuthContext.Provider>
-        </div>}
+
+         
+        </div>
+        
+        }
 
 
     </>
