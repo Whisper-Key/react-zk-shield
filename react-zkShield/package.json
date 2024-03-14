@@ -1,6 +1,6 @@
 {
   "name": "zkshield",
-  "version": "0.3.239",
+  "version": "0.3.241",
   "description": "A react component for authenticating SPAs using Mina",
   "type": "module",
   "main": "dist/src/index.js",
@@ -34,6 +34,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "o1js": "^0.16.0"
+    "o1js": "^0.16.0",
+    "prop-types": "^15.8.1"
   }
 }

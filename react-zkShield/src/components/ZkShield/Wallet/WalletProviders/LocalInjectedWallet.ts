@@ -29,16 +29,51 @@ export class LocalInjectedWallet implements IWalletProvider {
         console.log("LocalInjectedWallet.hasWallet", this.walletAvailable);
         return this.walletAvailable;
     }
-    connect(): Promise<WalletConnectResult> {
+    async connect(): Promise<WalletConnectResult> {
+        let connected = false;
         try {
             if (!this.connectedZkApps.includes(this.environment.location.origin)) {
-                this.connectedZkApps.push(this.environment.location.origin);
+                connected = (await this.showConnectDialog()) === 'connected';
+                console.log("LocalInjectedWallet.connect", connected);
+                if (connected) {
+                    this.connectedZkApps.push(this.environment.location.origin);
+                    return Promise.resolve(new WalletConnectResult(true, "", "", "", ""));
+
+                } else {
+                    return Promise.resolve(new WalletConnectResult(false, "", "", "", ""));
+                }
+
             }
-            console.log("LocalInjectedWallet.connect", this.connectedZkApps);
             return Promise.resolve(new WalletConnectResult(true, "", "", "", ""));
+
         } catch (e: any) {
             return Promise.resolve(new WalletConnectResult(false, e.code, e.message, e.message, e.data));
         }
+    }
+
+    showConnectDialog(): Promise<string> {
+        return new Promise((resolve, reject) => {
+            // Show your div with cancel and submit buttons
+            document.getElementById('local-wallet-connect')!.style.display = 'block';
+            // Event handlers for cancel and submit buttons
+            const cancelButton = document.getElementById('local-wallet-connect-cancel');
+            if (cancelButton) {
+                cancelButton.addEventListener('click', () => {
+                    document.getElementById('local-wallet-connect')!.style.display = 'none';
+
+                    reject('cancelled');
+                });
+            }
+
+            const connectButton = document.getElementById('local-wallet-connect-connect');
+            if (connectButton) {
+                connectButton.addEventListener('click', () => {
+                    document.getElementById('local-wallet-connect')!.style.display = 'none';
+
+                    resolve('connected');
+                });
+            }
+        });
     }
 
     disconnect(): Promise<WalletConnectResult> {

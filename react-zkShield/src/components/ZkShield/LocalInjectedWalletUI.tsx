@@ -10,7 +10,7 @@ export interface LocalInjectedWalletUIProps {
 }
 interface LocalInjectedWalletUMethods {
     toggleWallet: () => void;
-  }
+}
 
 interface LocalInjectedWalletUIState {
     showConnect: boolean;
@@ -18,14 +18,14 @@ interface LocalInjectedWalletUIState {
     showSignMessage: boolean;
     showWallet: boolean;
 }
-const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletUMethods, LocalInjectedWalletUIProps> = ({ providerSelectedHandler, network, localAccount }, ref : Ref<LocalInjectedWalletUMethods>) => {
+const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletUMethods, LocalInjectedWalletUIProps> = ({ providerSelectedHandler, network, localAccount }, ref: Ref<LocalInjectedWalletUMethods>) => {
 
     const confirmDivRef = React.createRef();
     const [state, setState] = useState<LocalInjectedWalletUIState>({
         showConnect: true,
         showSendZkTransaction: true,
         showSignMessage: true,
-        showWallet: false
+        showWallet: true
     });
 
     useEffect(() => {
@@ -43,7 +43,17 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
 
     useImperativeHandle(ref, () => ({
         toggleWallet
-      }));
+    }));
+
+    const sdk = (window as any).zkshield;
+    sdk.localConnector = {};
+    sdk.localConnector.showConnect = () => {
+        setState({ ...state, showConnect: true });
+    }
+    sdk.localConnector.showSendZkTransaction = () => {
+        setState({ ...state, showSendZkTransaction: true });
+    }
+
 
     return (
         <div>
@@ -54,15 +64,13 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
                 <div>
                     <h1>Local Blockchain Wallet</h1>
                     <div>
-                        {state.showConnect &&
-                            <>
-                                <p>Connect with {window.location.origin}</p>
-                                <div>
-                                    <button>Cancel</button>
-                                    <button>Connect</button>
-                                </div>
-                            </>
-                        }
+                        <div id="local-wallet-connect" style={ {"display": "none"}}>
+                            <p>Connect with {window.location.origin}</p>
+                            <div>
+                                <button id="local-wallet-connect-cancel">Cancel</button>
+                                <button id="local-wallet-connect-connect">Connect</button>
+                            </div>
+                        </div>
                     </div>
                     <div>
                         {state.showSendZkTransaction &&
