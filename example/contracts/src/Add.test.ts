@@ -59,6 +59,7 @@ describe('Add', () => {
       zkApp.update();
     });
     await txn.prove();
+    console.log("txn", txn.toPretty());
     await txn.sign([senderKey]).send();
 
     const updatedNum = zkApp.num.get();

@@ -59,7 +59,7 @@ describe('LocalInjectedWallet', () => {
 
         const fee = 1;
         const memo = "memo";
-        const transactionResult = await provider.sendZkTransaction(transaction, fee, memo);
+        const transactionResult = await provider.sendZkTransaction(zkshieldTests.data.sentZkTransaction.json, fee, memo);
 
         expect(transactionResult.succeded).toEqual(true);
         expect(transactionResult.transactionHash).toEqual("hash");
@@ -77,7 +77,7 @@ describe('LocalInjectedWallet', () => {
         const transaction = { prove: () => { return Promise.resolve(); }, sign: () => { return { send: () => { return Promise.resolve({ hash: "hash" }); } } } };
         const fee = 1;
         const memo = "memo";
-        const transactionResult = await provider.sendZkTransaction(transaction, fee, memo);
+        const transactionResult = await provider.sendZkTransaction(zkshieldTests.data.sentZkTransaction.json, fee, memo);
         expect(transactionResult.succeded).toEqual(false);
         expect(transactionResult.errorCode).toEqual("Not connected");
     });

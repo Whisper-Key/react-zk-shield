@@ -15,6 +15,7 @@ export class AuroWalletProvider implements IWalletProvider {
         this.mina = mina;
         console.log("AuroWalletProvider.constructor", mina);
     }
+   
     async selectChain(chainID: string): Promise<ChainSelectedResult> {
         try {
             await this.mina.switchChain({chainId: chainID.trim(),});
@@ -26,8 +27,8 @@ export class AuroWalletProvider implements IWalletProvider {
         }
     }
 
-    async sendZkTransaction(transaction: any, fee: number, memo: string): Promise<WalletTransactionResult> {
-        const json = transaction.toJSON();
+    async sendZkTransaction(json: string, fee: number, memo: string): Promise<WalletTransactionResult> {
+
         try {
             const { hash } = await this.mina.sendTransaction({
                 transaction: json,

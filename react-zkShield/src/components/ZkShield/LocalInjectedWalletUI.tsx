@@ -73,15 +73,14 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
                         </div>
                     </div>
                     <div>
-                        {state.showSendZkTransaction &&
-                            <>
+                    <div id="local-wallet-sendZkTransaction" style={ {"display": "none"}}>
                                 <p>Send ZK Transaction</p>
+                                <p>Information...</p>
                                 <div>
-                                    <button>Cancel</button>
-                                    <button>Approve</button>
+                                    <button id="local-wallet-sendZkTransaction-cancel">Cancel</button>
+                                    <button id="local-wallet-sendZkTransaction-approve">Approve</button>
                                 </div>
-                            </>
-                        }
+                          </div>
                     </div>
                     <div>
                         {state.showSignMessage &&

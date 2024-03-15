@@ -7,7 +7,8 @@ import { WalletTransactionResult } from "../WalletTransactionResult.js";
 import { ChainSelectedResult } from "../ChainSelectedResult.js";
 import { INetwork } from "../../Network/INetwork.js";
 import { LocalBlockchain } from "../../Network/LocalBlockchain.js";
-import { CircuitString, PrivateKey, Signature } from "o1js";
+import { CircuitString, PrivateKey, Signature, Types, Mina } from "o1js";
+// import * as o1 from "o1js";
 
 export class LocalInjectedWallet implements IWalletProvider {
 
@@ -35,6 +36,7 @@ export class LocalInjectedWallet implements IWalletProvider {
             if (!this.connectedZkApps.includes(this.environment.location.origin)) {
                 connected = (await this.showConnectDialog()) === 'connected';
                 console.log("LocalInjectedWallet.connect", connected);
+
                 if (connected) {
                     this.connectedZkApps.push(this.environment.location.origin);
                     return Promise.resolve(new WalletConnectResult(true, "", "", "", ""));
@@ -53,28 +55,28 @@ export class LocalInjectedWallet implements IWalletProvider {
 
     showConnectDialog(): Promise<string> {
         return new Promise((resolve, reject) => {
-            // Show your div with cancel and submit buttons
-            document.getElementById('local-wallet-connect')!.style.display = 'block';
-            // Event handlers for cancel and submit buttons
-            const cancelButton = document.getElementById('local-wallet-connect-cancel');
+
+            this.environment.document.getElementById('local-wallet-connect')!.style.display = 'block';
+            const cancelButton = this.environment.document.getElementById('local-wallet-connect-cancel');
             if (cancelButton) {
                 cancelButton.addEventListener('click', () => {
-                    document.getElementById('local-wallet-connect')!.style.display = 'none';
+                    this.environment.document.getElementById('local-wallet-connect')!.style.display = 'none';
 
                     reject('cancelled');
                 });
             }
 
-            const connectButton = document.getElementById('local-wallet-connect-connect');
+            const connectButton = this.environment.document.getElementById('local-wallet-connect-connect');
             if (connectButton) {
                 connectButton.addEventListener('click', () => {
-                    document.getElementById('local-wallet-connect')!.style.display = 'none';
+                    this.environment.document.getElementById('local-wallet-connect')!.style.display = 'none';
 
                     resolve('connected');
                 });
             }
         });
     }
+
 
     disconnect(): Promise<WalletConnectResult> {
         try {
@@ -88,20 +90,64 @@ export class LocalInjectedWallet implements IWalletProvider {
         }
     }
 
-    async sendZkTransaction(transaction: any, fee: number, memo: string): Promise<WalletTransactionResult> {
+    async sendZkTransaction(json: any, fee: number, memo: string): Promise<WalletTransactionResult> {
+        const command = JSON.parse(json) as Types.Json.ZkappCommand;
+        console.log("LocalInjectedWallet.sendZkTransaction.command");
+        const transaction = Mina.Transaction.fromJSON(command);
+
+        console.log("LocalInjectedWallet.sendZkTransaction.transaction");
+        //return Promise.resolve(new WalletTransactionResult(true, "", "cancelled", "user reject", "User rejected the transaction", ""));
+
+        let approved = false;
         try {
             if (!this.connectedZkApps.includes(this.environment.location.origin)) {
                 return new WalletTransactionResult(false, "", "Not connected", "Not connected", "Not connected", "Not connected");
             }
-            console.log("LocalInjectedWallet.sendZkTransaction", transaction, fee, memo);
-            await transaction.prove();
-            const { hash } = await transaction.sign([this.localAccount]).send();
-            return new WalletTransactionResult(true, hash, "", "", "", hash);
+            approved = (await this.showSendZkDialog()) === 'approved';
+            console.log("LocalInjectedWallet.approved", approved);
+            if (approved) {
+                const chain = Mina.LocalBlockchain({ proofsEnabled: false });
+                Mina.setActiveInstance(chain)
+                console.log("LocalInjectedWallet.sendZkTransaction", transaction, fee, memo);
+                //await transaction.prove();
+                const { hash } = await transaction.sign([this.localAccount]).send();
+                console.log("LocalInjectedWallet.sendZkTransaction.hash", hash);
+                return Promise.resolve(new WalletTransactionResult(true, hash()!, "", "", "", hash));
+
+            } else {
+                return Promise.resolve(new WalletTransactionResult(true, "", "cancelled", "user reject", "User rejected the transaction", ""));
+            }
         } catch (e: any) {
             var result = this.getWalletTransactionError(e);
-            return result;
+            console.log("LocalInjectedWallet.sendZkTransaction.error", result);
+            return Promise.resolve(result);
         }
     }
+
+    showSendZkDialog(): Promise<string> {
+        return new Promise((resolve, reject) => {
+
+            this.environment.document.getElementById('local-wallet-sendZkTransaction')!.style.display = 'block';
+            const cancelButton = this.environment.document.getElementById('local-wallet-sendZkTransaction-cancel');
+            if (cancelButton) {
+                cancelButton.addEventListener('click', () => {
+                    this.environment.document.getElementById('local-wallet-sendZkTransaction')!.style.display = 'none';
+
+                    reject('cancelled');
+                });
+            }
+
+            const connectButton = this.environment.document.getElementById('local-wallet-sendZkTransaction-approve');
+            if (connectButton) {
+                connectButton.addEventListener('click', () => {
+                    this.environment.document.getElementById('local-wallet-sendZkTransaction')!.style.display = 'none';
+
+                    resolve('approved');
+                });
+            }
+        });
+    }
+
 
     signMessage(message: string): Promise<SignedMessageResult> {
         console.log("LocalInjectedWallet.signMessage", message);
