@@ -38,12 +38,17 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
     }, []);
 
     const toggleWallet = () => {
-        setState({ ...state, showWallet: !state.showWallet });
+
+        const currentMode = window.document.getElementById('local-wallet-toggle')!.innerText;
+        console.log("currentMode", currentMode);
+
+        window.document.getElementById('local-wallet-toggle')!.innerText = currentMode === "Show Wallet" ? "Hide Wallet" : "Show Wallet";
+        window.document.getElementById('local-wallet')!.style.display = currentMode == "Show Wallet" ? 'none' : 'block';
     }
 
-    useImperativeHandle(ref, () => ({
-        toggleWallet
-    }));
+    // useImperativeHandle(ref, () => ({
+    //     toggleWallet
+    // }));
 
     const sdk = (window as any).zkshield;
     sdk.localConnector = {};
@@ -54,17 +59,31 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
         setState({ ...state, showSendZkTransaction: true });
     }
 
+    const hideWallet = () => {
+        // window.document.getElementById('local-wallet-toggle')!.innerText = "Show Wallet";
+        window.document.getElementById('local-wallet')!.style.display ='none';
+        window.document.getElementById('local-wallet-hide')!.style.display ='none';
+        window.document.getElementById('local-wallet-show')!.style.display ='block';
+    }
+
+    const showWallet = () => {
+        // window.document.getElementById('local-wallet-toggle')!.innerText = "Hide Wallet";
+        window.document.getElementById('local-wallet')!.style.display ='block';
+        window.document.getElementById('local-wallet-show')!.style.display ='none';
+        window.document.getElementById('local-wallet-hide')!.style.display ='block';
+    }
+
 
     return (
         <div>
             <div>
-                <button onClick={() => toggleWallet()}>{state.showWallet ? "Hide Wallet" : "Show Wallet"}</button>
+                <button id="local-wallet-hide" onClick={hideWallet}>Hide Wallet</button>
+                <button id="local-wallet-show" style={{ "display": "none" }} onClick={showWallet}>Show Wallet</button>
             </div>
-            {state.showWallet &&
-                <div>
+                <div id="local-wallet">
                     <h1>Local Blockchain Wallet</h1>
                     <div>
-                        <div id="local-wallet-connect" style={ {"display": "none"}}>
+                        <div id="local-wallet-connect" style={{ "display": "none" }}>
                             <p>Connect with {window.location.origin}</p>
                             <div>
                                 <button id="local-wallet-connect-cancel">Cancel</button>
@@ -73,29 +92,27 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
                         </div>
                     </div>
                     <div>
-                    <div id="local-wallet-sendZkTransaction" style={ {"display": "none"}}>
-                                <p>Send ZK Transaction</p>
-                                <p>Information...</p>
-                                <div>
-                                    <button id="local-wallet-sendZkTransaction-cancel">Cancel</button>
-                                    <button id="local-wallet-sendZkTransaction-approve">Approve</button>
-                                </div>
-                          </div>
+                        <div id="local-wallet-sendZkTransaction" style={{ "display": "none" }}>
+                            <p>Send ZK Transaction</p>
+                            <p>Information...</p>
+                            <div>
+                                <button id="local-wallet-sendZkTransaction-cancel">Cancel</button>
+                                <button id="local-wallet-sendZkTransaction-approve">Approve</button>
+                            </div>
+                        </div>
                     </div>
                     <div>
-                        {state.showSignMessage &&
-                            <>
-                                <p>Sign message</p>
-                                <p>Message: </p>
-                                <div>
-                                    <button>Cancel</button>
-                                    <button>Sign</button>
-                                </div>
-                            </>
-                        }
+                        <div id="local-wallet-signMessage" style={{ "display": "none" }}>
+
+                            <p>Sign message</p>
+                            <p>Message: </p>
+                            <div>
+                                <button id="local-wallet-signMessage-cancel">Cancel</button>
+                                <button id="local-wallet-signMessage-sign">Sign</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-            }
         </div>
     );
 }

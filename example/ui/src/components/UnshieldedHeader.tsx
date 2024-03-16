@@ -18,7 +18,8 @@ const UnshieldedHeader: React.FC<UnshieldedHeaderProps> = ({ showConnect }) => {
       <div className={styles.header}>
       <Link href="/" className={styles.logo}>ZK Shield</Link>
         <div className={styles["header-right"]}>
-          <Link  href="/sendlocaltransaction">Send Local ZK JSON</Link>
+          <Link  href="/sendlocaltransaction">Send ZK JSON</Link>
+          <Link  href="/signmessage">Sign</Link>
           <Link  href="/disableconnect">Disable Connect</Link>
           <Link href="/launch">Launch</Link>
           <Link href="/style">Style</Link>

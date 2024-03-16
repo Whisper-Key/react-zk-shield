@@ -34,6 +34,7 @@ export class LocalInjectedWallet implements IWalletProvider {
         let connected = false;
         try {
             if (!this.connectedZkApps.includes(this.environment.location.origin)) {
+                this.showWallet();
                 connected = (await this.showConnectDialog()) === 'connected';
                 console.log("LocalInjectedWallet.connect", connected);
 
@@ -97,6 +98,7 @@ export class LocalInjectedWallet implements IWalletProvider {
 
         console.log("LocalInjectedWallet.sendZkTransaction.transaction");
         //return Promise.resolve(new WalletTransactionResult(true, "", "cancelled", "user reject", "User rejected the transaction", ""));
+        this.showWallet();
 
         let approved = false;
         try {
@@ -149,11 +151,44 @@ export class LocalInjectedWallet implements IWalletProvider {
     }
 
 
-    signMessage(message: string): Promise<SignedMessageResult> {
-        console.log("LocalInjectedWallet.signMessage", message);
-        const signature = Signature.create(this.localAccount, CircuitString.fromString(message).toFields());
-        return Promise.resolve(new SignedMessageResult(true, "", "", "", signature, null));
+    async signMessage(message: string): Promise<SignedMessageResult> {
+        this.showWallet();
+        let shouldSign = false;
+        console.log("LocalInjectedWallet.signMessage.message", message);
+        shouldSign = (await this.showSignMessageDialog()) === 'signed';
+        if (shouldSign) {
+            const signature = Signature.create(this.localAccount, CircuitString.fromString(message).toFields());
+           console.log("LocalInjectedWallet.signMessage.signature", signature.toJSON());
+            return Promise.resolve(new SignedMessageResult(true, "", "", "", signature, null));
+        } else {
+            return Promise.resolve(new SignedMessageResult(false, "", "cancelled", "user reject", "User rejected the signing", null));
+        }
     }
+
+    showSignMessageDialog(): Promise<string> {
+        return new Promise((resolve, reject) => {
+
+            this.environment.document.getElementById('local-wallet-signMessage')!.style.display = 'block';
+            const cancelButton = this.environment.document.getElementById('local-wallet-signMessage-cancel');
+            if (cancelButton) {
+                cancelButton.addEventListener('click', () => {
+                    this.environment.document.getElementById('local-wallet-signMessage')!.style.display = 'none';
+
+                    reject('cancelled');
+                });
+            }
+
+            const connectButton = this.environment.document.getElementById('local-wallet-signMessage-sign');
+            if (connectButton) {
+                connectButton.addEventListener('click', () => {
+                    this.environment.document.getElementById('local-wallet-signMessage')!.style.display = 'none';
+
+                    resolve('signed');
+                });
+            }
+        });
+    }
+
 
     selectChain(chainID: string): Promise<ChainSelectedResult> {
         console.log("LocalInjectedWallet.selectChain", chainID);
@@ -162,5 +197,19 @@ export class LocalInjectedWallet implements IWalletProvider {
 
     getWalletTransactionError(e: any): WalletTransactionResult {
         return new WalletTransactionResult(false, "", e.code, e.message, e.message, e.data);
+    }
+
+    hideWallet(): void {
+        // this.environment.document.getElementById('local-wallet-toggle')!.innerText = "Show Wallet";
+        this.environment.document.getElementById('local-wallet')!.style.display ='none';
+        this.environment.document.getElementById('local-wallet-hide')!.style.display ='none';
+        this.environment.document.getElementById('local-wallet-show')!.style.display ='block';
+     }
+
+    showWallet(): void {
+        // this.environment.document.getElementById('local-wallet-toggle')!.innerText = "Hide Wallet";
+        this.environment.document.getElementById('local-wallet')!.style.display ='block';
+        this.environment.document.getElementById('local-wallet-show')!.style.display ='none';
+        this.environment.document.getElementById('local-wallet-hide')!.style.display ='block';
     }
 }
