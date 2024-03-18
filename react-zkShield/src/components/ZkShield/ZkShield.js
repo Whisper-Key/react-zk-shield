@@ -65,6 +65,7 @@ const ZkShield = ({
     alertNeedsSpinner: false,
     creator: null,
     connectedNetwork:'',
+    localAccount: ''
   });
 
   const [userAuthenticated, setUserAuthenticated] = useState(false);
@@ -151,8 +152,11 @@ const ZkShield = ({
           setUserAddress(authentication.address);
           setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication, providerSelected: true });
 
-          setAuthState({ ...authState, userAuthenticated: true, userAddress: authentication.address, firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in', connectedNetwork: state.network });
-
+          setAuthState({ ...authState, 
+            userAuthenticated: true, 
+            userAddress: authentication.address, 
+            localAccount: localAccount,
+            firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in', connectedNetwork: state.network });
         }
 
       }

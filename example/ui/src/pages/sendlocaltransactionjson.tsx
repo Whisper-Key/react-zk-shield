@@ -10,11 +10,10 @@ import React from 'react';
 import ShieldedHeading from '@/components/ShieldedHeading';
 import { PrivateKey } from 'o1js';
 import SendZkJsonComponent from '@/components/SendZkJsonComponent';
-import SendTransaction from '@/components/SendTransaction';
 // import { WalletImage } from '../modules/WalletImage.js';
 
 export default function Home() {
-  const privateKey = PrivateKey.fromBase58(process.env.NEXT_PUBLIC_LOCAL_ACCOUNT_KEY!);
+  const privateKey = PrivateKey.random();
   return (
     <>
       <div id="zkshield-connect">
@@ -30,7 +29,7 @@ export default function Home() {
                 localAccount={privateKey.toBase58()}
                 >
 
-        <SendTransaction />
+        <SendZkJsonComponent />
             
         </ZkShield>
       </GradientBG>

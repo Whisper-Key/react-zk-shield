@@ -1,4 +1,4 @@
-import { fetchAccount, PublicKey, Field } from 'o1js';
+import { fetchAccount, PublicKey, Field, PrivateKey } from 'o1js';
 
 import type {
   ZkappWorkerRequest,
@@ -9,8 +9,9 @@ import type {
 export default class ZkappWorkerClient {
   // ---------------------------------------------------------------------------------------
 
-  setActiveInstanceToBerkeley() {
-    return this._call('setActiveInstanceToBerkeley', {});
+  setLocal(privateKey: PrivateKey) {
+    console.log('worker client setLocal', privateKey);
+    return this._call('setLocal', { privateKey: privateKey });
   }
 
   loadContract() {
