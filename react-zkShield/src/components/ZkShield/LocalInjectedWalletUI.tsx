@@ -1,8 +1,11 @@
 import { IWalletProvider } from "./Wallet/IWalletProvider.js";
 import { WalletProviderRegistry } from "./Wallet/WalletProviderRegistry.js";
 import { useState, useEffect, useImperativeHandle, Ref, forwardRef } from 'react';
+import { PublicKey, PrivateKey, Mina } from "o1js";
+
 import React from "react";
 import { LocalInjectedWallet } from "./Wallet/WalletProviders/LocalInjectedWallet.js";
+import { AddressUtitlities } from "../../modules/AddressUtitlities.js";
 export interface LocalInjectedWalletUIProps {
     providerSelectedHandler: any;
     network: string;
@@ -17,6 +20,8 @@ interface LocalInjectedWalletUIState {
     showSendZkTransaction: boolean;
     showSignMessage: boolean;
     showWallet: boolean;
+    account: PublicKey | null,
+    balance: bigint | null,
 }
 const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletUMethods, LocalInjectedWalletUIProps> = ({ providerSelectedHandler, network, localAccount }, ref: Ref<LocalInjectedWalletUMethods>) => {
 
@@ -25,14 +30,23 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
         showConnect: true,
         showSendZkTransaction: true,
         showSignMessage: true,
-        showWallet: true
+        showWallet: true,
+        account: null,
+        balance: null
     });
+
+
 
     useEffect(() => {
 
         (async () => {
+            const local = Mina.LocalBlockchain({ proofsEnabled: false });
+            Mina.setActiveInstance(local);
+            const publicKey = PrivateKey.fromBase58(localAccount).toPublicKey();
+            local.addAccount(publicKey, '10_000_000_000');
+            const account = Mina.getAccount(publicKey);
             //const localWalletProvider = (window as any).zkshield.walletProvider as LocalInjectedWallet;
-
+            setState({ ...state, account:  publicKey, balance: account.balance.toBigInt()});
 
         })();
     }, []);
@@ -73,6 +87,9 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
         window.document.getElementById('local-wallet-hide')!.style.display ='block';
     }
 
+    const copyAddress = () => {
+        navigator.clipboard.writeText(state.account!.toBase58());
+    }
 
     return (
         <div>
@@ -82,6 +99,18 @@ const LocalInjectedWalletUI: React.ForwardRefRenderFunction<LocalInjectedWalletU
             </div>
                 <div id="local-wallet">
                     <h1>Local Blockchain Wallet</h1>
+                    <div>
+                        { state.account != null && 
+                            <a onClick={copyAddress} style={{"cursor": "pointer"}}>
+                            {AddressUtitlities.shortenAddress(state.account.toBase58())}
+                            </a>
+                        }
+                    </div>
+                    <div>
+                        {state.balance != null &&
+                            <span>{state.balance.toString()} MINA</span>
+                        }
+                    </div>
                     <div>
                         <div id="local-wallet-connect" style={{ "display": "none" }}>
                             <p>Connect with {window.location.origin}</p>

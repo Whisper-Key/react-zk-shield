@@ -94,7 +94,10 @@ const ZkShield = ({
     setState({ ...state, launch: launchState });
 
     (async () => {
-
+      window.zkshield.changeNetwork = (network) => {
+        setState({ ...state, networkSelected: true, network: network });
+      };
+    
       if (autoLaunch && minaWalletProvider) {
         const network = new NetworkWorkerClient();
         const walletProvider = minaWalletProvider ?? new AuroWalletProvider(window.mina);
@@ -184,10 +187,12 @@ const ZkShield = ({
   }
 
 
+
+
   return (
     <>
 
-     {state.networkSelected && <LocalInjectedWalletUI ref={injectedWalletRef} /> }
+     {state.networkSelected && <LocalInjectedWalletUI ref={injectedWalletRef} localAccount={localAccount}  /> }
 
 
       {state.launch && !state.hasBeenSetup ?

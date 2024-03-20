@@ -1,6 +1,7 @@
 import {AuthContext, ZkShield } from "./components/ZkShield/ZkShield.js";
+import {ChooseNetworkComponent } from "./components/ZkShield/ChooseNetworkComponent.js";
 export {AuthContext, ZkShield};
-
+export {ChooseNetworkComponent}
 import { LocalInjectedWallet } from "./components/ZkShield/Wallet/WalletProviders/LocalInjectedWallet.js";
 import { IWalletProvider } from "./components/ZkShield/Wallet/IWalletProvider.js";
 import { ChainSelectedResult } from "./components/ZkShield/Wallet/ChainSelectedResult.js";
