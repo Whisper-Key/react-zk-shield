@@ -19,23 +19,34 @@ const functions = {
     loado1js: async (args: {}) => {
         await isReady;
     },
-    setActiveInstance: async (args: { network: supportedNetwork, localAccount: string }) => {
-        console.log('setActiveInstance', args.network);
-        console.log('setActiveInstance local account', args.localAccount);
-        network = NetworkFactory.createNetwork(args.network, args.localAccount);
-        network.setActiveInstance();
+    setActiveInstance: async (args: { network: supportedNetwork, url: string, archiveUrl: string }) => {
+        // console.log('setActiveInstance', args.network);
+        // console.log('setActiveInstance local account', args.localAccount);
+        // network = NetworkFactory.createNetwork(args.network, args.localAccount);
+        // network.setActiveInstance();
 
+        const blockchain = Mina.Network({
+            mina: args.url,
+            archive: args.archiveUrl,
+        });
+        Mina.setActiveInstance(blockchain);
     },
 
     fetchUserAccount: async (args: { publicKey58: string }) => {
-        console.log('fetchUserAccount from worker', args.publicKey58);
         try {
+            console.log('fetchUserAccount from worker', args.publicKey58);
+            console.log("fetch next line");
+            let fetch = await fetchAccount({ publicKey: args.publicKey58 });
+            console.log("fetched @ ", new Date().toLocaleTimeString());
+            return fetch;
+
             const account = await network.fetchUserAccount(args.publicKey58);
             console.log('account from worker', account);
             return account;
         } catch (e) {
-
             console.log('fetchUserAccount error', e);
+            console.log("active instance", Mina.activeInstance.getNetworkId());
+            console.log("active instance constants", Mina.activeInstance.getNetworkConstants());
         }
     },
 };

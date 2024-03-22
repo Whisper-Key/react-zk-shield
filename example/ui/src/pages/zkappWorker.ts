@@ -45,27 +45,25 @@ const functions = {
       const publicKey = PublicKey.fromBase58(args.publicKey58);
       state.zkapp = new state.Add!(publicKey);
     } else {
+      let deployerAccount: PublicKey,
+      deployerKey: PrivateKey;
       let zkAppPrivateKey = PrivateKey.random();
       let zkAppAddress = zkAppPrivateKey.toPublicKey();
-      let deployerAccount = {
-        privateKey: PrivateKey.fromBase58(state.privateKey!),
-        publicKey: null as null | PublicKey
-      };
+      
       const local = Mina.LocalBlockchain({ proofsEnabled: false });
-      local.addAccount(deployerAccount.privateKey.toPublicKey(), '10_000_000_000');
+      ({ privateKey: deployerKey, publicKey: deployerAccount } =
+        local.testAccounts[0]);
       Mina.setActiveInstance(local);
       try {
-        deployerAccount.publicKey = deployerAccount.privateKey.toPublicKey();
         state.zkapp = new state.Add!(zkAppAddress);
         console.log('deploying zkapp');
-        const txn = await Mina.transaction(deployerAccount.publicKey, () => {
-          AccountUpdate.fundNewAccount(deployerAccount.publicKey!);
+        const txn = await Mina.transaction(deployerAccount, () => {
+          AccountUpdate.fundNewAccount(deployerAccount);
           state.zkapp!.deploy();
         });
-        console.log('proving zkapp');
         await txn.prove();
-        console.log('signing zkapp');
-        await txn.sign([deployerAccount.privateKey, zkAppPrivateKey]).send();
+        // this tx needs .sign(), because `deploy()` adds an account update that requires signature authorization
+        await txn.sign([deployerKey, zkAppPrivateKey]).send();
         console.log('zkapp deployed');
       } catch (e) {
         console.log('initZkappInstance error', e);

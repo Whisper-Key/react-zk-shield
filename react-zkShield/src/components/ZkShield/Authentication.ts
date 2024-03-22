@@ -34,10 +34,10 @@ export class Authentication {
     }
 
     async loadO1js(network: string, localAccount?: string): Promise<boolean> {
-        await this.networkClient.loado1js();
+        //await this.networkClient.loado1js();
         this.activeNetworkProvider = NetworkFactory.createNetwork(this.network, localAccount);
         console.log("activeNetworkProvider", this.activeNetworkProvider);
-        await this.networkClient.setupActiveInstance(this.network, localAccount);
+        //await this.networkClient.setupActiveInstance(this.network, localAccount);
         await this.walletProvider.selectChain(network);
         this.o1jsLoaded = true;
         return true;
@@ -55,7 +55,7 @@ export class Authentication {
     
     async doesAccountExist(): Promise<boolean> {
         try {
-        const res = await this.networkClient.fetchUserAccount(this.address) as any;
+        const res = await this.activeNetworkProvider!.fetchUserAccount(this.address) as any;
         console.log("does account exist", res);
         this.fundAccount = res.error != null;
         return !this.fundAccount;
