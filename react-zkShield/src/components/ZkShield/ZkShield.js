@@ -26,13 +26,13 @@ const ZkShield = ({
   requestingAccountText,
   fundAccountText,
   ignoreConnectForTesting,
-  minaWalletProvider, 
+  minaWalletProvider,
   autoLaunch,
   localAccount,
   selectNetworkClassName,
   selectProviderClassName,
   children }) => {
-    
+
 
   let [state, setState] = useState({
     authentication: null,
@@ -53,7 +53,7 @@ const ZkShield = ({
     providerSelected: false,
     networkSelected: false,
     network: null,
-    launch: true
+    launch: !(autoLaunch == false),//true
   });
 
   let [authState, setAuthState] = useState({
@@ -64,7 +64,7 @@ const ZkShield = ({
     alertMessage: '',
     alertNeedsSpinner: false,
     creator: null,
-    connectedNetwork:'',
+    connectedNetwork: '',
     localAccount: ''
   });
 
@@ -86,18 +86,29 @@ const ZkShield = ({
     window.zkshield = {
       launch: () => {
         console.log("launching");
-        setState({ ...state, launch: true });
+        console.log("network selected", state.networkSelected);
+        setState({ ...state, launch: true, networkSelected: window.zkshield.networkSet, network: window.zkshield.network });
+      },
+      changeNetwork: (network) => {
+        console.log("launch in sdk change network", state.launch);
+        console.log("network in sdk change network", network);
+        window.zkshield.networkSet = true;
+        window.zkshield.network = network;
+
+        setState({ ...state, networkSelected: true, network: network });
       }
     };
 
-    const launchState = autoLaunch ?? state.launch;
-    setState({ ...state, launch: launchState });
+    // const launchState = (autoLaunch == null || autoLaunch == false) ? false : state.launch;
+    // console.log("launch state", launchState);
+    // setState({ ...state, launch: launchState });
 
     (async () => {
-      window.zkshield.changeNetwork = (network) => {
-        setState({ ...state, networkSelected: true, network: network });
-      };
-    
+      // window.zkshield.changeNetwork = (network) => {
+      //   console.log("launch in change network", state.launch);
+      //   setState({ ...state, networkSelected: true, network: network });
+      // };
+
       if (autoLaunch && minaWalletProvider) {
         const network = new NetworkWorkerClient();
         const walletProvider = minaWalletProvider ?? new AuroWalletProvider(window.mina);
@@ -155,11 +166,15 @@ const ZkShield = ({
           setUserAddress(authentication.address);
           setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication, providerSelected: true });
 
-          setAuthState({ ...authState, 
-            userAuthenticated: true, 
-            userAddress: authentication.address, 
+          window.zkshield.connected = true;
+
+          setAuthState({
+            ...authState,
+            userAuthenticated: true,
+            userAddress: authentication.address,
             localAccount: localAccount,
-            firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in', connectedNetwork: state.network });
+            firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in', connectedNetwork: state.network
+          });
         }
 
       }
@@ -192,26 +207,26 @@ const ZkShield = ({
   return (
     <>
 
-     {state.networkSelected && <LocalInjectedWalletUI ref={injectedWalletRef} localAccount={localAccount}  /> }
+      {(state.launch && state.networkSelected && state.network == "local") && <LocalInjectedWalletUI ref={injectedWalletRef} localAccount={localAccount} />}
 
 
       {state.launch && !state.hasBeenSetup ?
-        
+
         <div className={mainContainerClassName ?? "zkshield-main-container"}>
           <div className={innerContainerClassName ?? "zkshield-inner-container"}>
-            {minaWalletProvider == null && !state.providerSelected && 
-            <div>
-            {!state.networkSelected && 
-              <div className={selectNetworkClassName ?? "zkshield-select-network-container"}>
-                <SelectNetwork networkSelectedHandler={networkSelected} /> 
+            {minaWalletProvider == null && !state.providerSelected &&
+              <div>
+                {!state.networkSelected &&
+                  <div className={selectNetworkClassName ?? "zkshield-select-network-container"}>
+                    <SelectNetwork networkSelectedHandler={networkSelected} />
+                  </div>
+                }
+                {state.networkSelected &&
+                  <div className={selectProviderClassName ?? "zkshield-select-provider-container"}>
+                    <SelectProvider network={state.network} localAccount={localAccount} providerSelectedHandler={providerSelected} />
+                  </div>
+                }
               </div>
-            }
-            {state.networkSelected && 
-              <div className={selectProviderClassName ?? "zkshield-select-provider-container"}>
-                <SelectProvider network={state.network} localAccount={localAccount} providerSelectedHandler={providerSelected} /> 
-              </div>
-            }
-            </div>
             }
             {state.providerSelected &&
               <div>
@@ -267,10 +282,10 @@ const ZkShield = ({
             {children}
           </AuthContext.Provider>
 
-         
+
         </div>
-        
-        }
+
+      }
 
 
     </>

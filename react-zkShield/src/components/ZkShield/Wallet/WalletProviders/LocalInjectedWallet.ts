@@ -203,13 +203,15 @@ export class LocalInjectedWallet implements IWalletProvider {
         // this.environment.document.getElementById('local-wallet-toggle')!.innerText = "Show Wallet";
         this.environment.document.getElementById('local-wallet')!.style.display ='none';
         this.environment.document.getElementById('local-wallet-hide')!.style.display ='none';
-        this.environment.document.getElementById('local-wallet-show')!.style.display ='block';
+        this.environment.document.getElementById('local-wallet-show')!.style.display ='';
+        console.log("hide wallet from local wallet");
      }
 
     showWallet(): void {
         // this.environment.document.getElementById('local-wallet-toggle')!.innerText = "Hide Wallet";
         this.environment.document.getElementById('local-wallet')!.style.display ='block';
         this.environment.document.getElementById('local-wallet-show')!.style.display ='none';
-        this.environment.document.getElementById('local-wallet-hide')!.style.display ='block';
+        this.environment.document.getElementById('local-wallet-hide')!.style.display ='';
+        console.log("show wallet from local wallet");
     }
 }

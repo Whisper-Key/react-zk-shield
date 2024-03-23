@@ -26,7 +26,7 @@ const UnshieldedHeader: React.FC<UnshieldedHeaderProps> = ({ showConnect }) => {
           <Link href="/launch">Launch</Link>
           <Link href="/style">Style</Link>
           <Link href="/text">Text</Link>
-          {showConnect &&  <Link href="#" className={styles.active} onClick={() => (window as any).zkshield.launch()}>Connect wallet</Link>}
+          {showConnect && <button className="btn btn-primary" onClick={() => (window as any).zkshield.launch()}>Connect wallet</button> }
         </div>
       </div>
 

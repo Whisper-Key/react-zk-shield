@@ -25,7 +25,7 @@ const SelectNetwork: React.FC<SelectNetworkProps> = ({ networkSelectedHandler })
     return (
         <div>
             <h1>Select Network</h1>
-            <select onChange={networkChanged}>
+            <select onChange={networkChanged} className="select select-bordered w-full max-w-xs">
                 <option>Select a network</option>
                 
                 {supportedNetworks.map((network) => (
