@@ -9,11 +9,13 @@ import UnshieldedHeader from "@/components/UnshieldedHeader";
 import React from 'react';
 import ShieldedHeading from '@/components/ShieldedHeading';
 import { PrivateKey, Mina, PublicKey, fetchAccount } from 'o1js';
+import SendTransaction from '@/components/SendTransaction';
+
 // import { WalletImage } from '../modules/WalletImage.js';
 
 export default function Home() {
   const privateKey = PrivateKey.fromBase58(process.env.NEXT_PUBLIC_LOCAL_ACCOUNT_KEY!);
-  
+
   return (
     <>
       <div id="zkshield-connect">
@@ -30,6 +32,7 @@ export default function Home() {
           >
 
             <ShieldedHeading />
+            <SendTransaction />
 
           </ZkShield>
         </GradientBG>
