@@ -11,7 +11,7 @@ import ShieldedHeading from '@/components/ShieldedHeading';
 import { AccountUpdate, Mina, PrivateKey, PublicKey } from 'o1js';
 import SendZkJsonComponent from '@/components/SendZkJsonComponent';
 import SendTransaction from '@/components/SendTransaction';
-import { Add } from '../../../contracts/build/src/Add.js';
+// import { Add } from '../../../contracts/build/src/Add.js';
 // import { WalletImage } from '../modules/WalletImage.js';
 
 export default function Home() {
@@ -22,7 +22,7 @@ export default function Home() {
   senderKey: PrivateKey,
   zkAppAddress: PublicKey,
   zkAppPrivateKey: PrivateKey,
-  zkApp: Add,
+  // zkApp: Add,
   proofsEnabled: boolean = false;
 
 //   useEffect(() => {
