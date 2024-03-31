@@ -21,6 +21,8 @@ export default function Home() {
       <div id="zkshield-connect">
         <GradientBG>
           <UnshieldedHeader />
+          
+      <h1 style={ {textAlign: 'center'}}>Browser hangs on local blockchain deploy contract, at compile step.</h1>
           <ZkShield mainContainerClassName={styles.main}
             innerContainerClassName={styles.center}
             selectNetworkClassName={styles.selectNetworkContainer}
@@ -30,6 +32,7 @@ export default function Home() {
             localAccount={privateKey.toBase58()}
             autoLaunch={true}
           >
+      
 
             <ShieldedHeading />
             <SendTransaction />

@@ -18,14 +18,14 @@ const UnshieldedHeader: React.FC<UnshieldedHeaderProps> = ({ showConnect }) => {
       <div className={styles.header}>
       <Link href="/" className={styles.logo}>ZK Shield</Link>
         <div className={styles["header-right"]}>
-          <Link  href="/sendlocaltransaction">Send ZK</Link>
+          {/* <Link  href="/sendberkeley">Send ZK</Link> */}
           <Link  href="/sendlocaltransactionjson">Send ZK JSON</Link>
           <Link  href="/choosenetwork">Choose Network</Link>
           <Link  href="/signmessage">Sign</Link>
-          <Link  href="/disableconnect">Disable Connect</Link>
+          {/* <Link  href="/disableconnect">Disable Connect</Link> */}
           <Link href="/launch">Launch</Link>
-          <Link href="/style">Style</Link>
-          <Link href="/text">Text</Link>
+          {/* <Link href="/style">Style</Link> */}
+          {/* <Link href="/text">Text</Link> */}
           {showConnect && <button className="btn btn-primary" onClick={() => (window as any).zkshield.launch()}>Connect wallet</button> }
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { Mina, PublicKey, fetchAccount } from 'o1js';
+import { AccountUpdate, Mina, PrivateKey, PublicKey, fetchAccount } from 'o1js';
 
 type Transaction = Awaited<ReturnType<typeof Mina.transaction>>;
 
@@ -9,12 +9,19 @@ import type { Add } from '../../../contracts/src/Add';
 const state = {
   Add: null as null | typeof Add,
   zkapp: null as null | Add,
-  transaction: null as null | Transaction
+  transaction: null as null | Transaction,
+  privateKey: null as null | string,
+  useLocal: false
 };
 
 // ---------------------------------------------------------------------------------------
 
 const functions = {
+  setLocal: async (args: { privateKey: string }) => {
+    console.log('worker setLocal', args.privateKey);
+    state.privateKey = args.privateKey;
+    state.useLocal = true;
+  },
   setActiveInstanceToBerkeley: async (args: {}) => {
     const Berkeley = Mina.Network(
       'https://api.minascan.io/node/berkeley/v1/graphql'
@@ -27,15 +34,41 @@ const functions = {
     state.Add = Add;
   },
   compileContract: async (args: {}) => {
-    await state.Add!.compile();
+    if (!state.useLocal) { await state.Add!.compile();}
   },
   fetchAccount: async (args: { publicKey58: string }) => {
-    const publicKey = PublicKey.fromBase58(args.publicKey58);
+    if (!state.useLocal) {  const publicKey = PublicKey.fromBase58(args.publicKey58);
     return await fetchAccount({ publicKey });
+    }
   },
   initZkappInstance: async (args: { publicKey58: string }) => {
-    const publicKey = PublicKey.fromBase58(args.publicKey58);
+    if (!state.useLocal) {const publicKey = PublicKey.fromBase58(args.publicKey58);
     state.zkapp = new state.Add!(publicKey);
+    }else {
+      let deployerAccount: PublicKey,
+      deployerKey: PrivateKey;
+      let zkAppPrivateKey = PrivateKey.random();
+      let zkAppAddress = zkAppPrivateKey.toPublicKey();
+      
+      const local = Mina.LocalBlockchain({ proofsEnabled: false });
+      ({ privateKey: deployerKey, publicKey: deployerAccount } =
+        local.testAccounts[0]);
+      Mina.setActiveInstance(local);
+      try {
+        state.zkapp = new state.Add!(zkAppAddress);
+        console.log('deploying zkapp');
+        const txn = await Mina.transaction(deployerAccount, () => {
+          AccountUpdate.fundNewAccount(deployerAccount);
+          state.zkapp!.deploy();
+        });
+        await txn.prove();
+        // this tx needs .sign(), because `deploy()` adds an account update that requires signature authorization
+        await txn.sign([deployerKey, zkAppPrivateKey]).send();
+        console.log('zkapp deployed');
+      } catch (e) {
+        console.log('initZkappInstance error', e);
+      }
+    }
   },
   getNum: async (args: {}) => {
     const currentNum = await state.zkapp!.num.get();

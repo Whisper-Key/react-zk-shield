@@ -1,8 +1,8 @@
 
-  import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import '../pages/reactCOIServiceWorker';
 import ZkappWorkerClient from '../pages/zkappWorkerClient';
-import { PublicKey, Field } from 'o1js';
+import { PublicKey, Field, PrivateKey } from 'o1js';
 import GradientBG from '../components/GradientBG.js';
 import styles from '../styles/Home.module.css';
 
@@ -46,16 +46,22 @@ const SendTransaction = () => {
         setDisplayText('Done loading web worker');
         console.log('Done loading web worker');
 
-        await zkappWorkerClient.setActiveInstanceToBerkeley();
+        const networkChoosen = (window as any).zkshield.network;
+        console.log("zkshield network", networkChoosen)
 
-        const mina = (window as any).mina;
-
-        if (mina == null) {
+        if (networkChoosen == 'local') {
+          const privateKey = PrivateKey.fromBase58(process.env.NEXT_PUBLIC_LOCAL_ACCOUNT_KEY!);
+          await zkappWorkerClient.setLocal(privateKey);
+        } else {
+          await zkappWorkerClient.setActiveInstanceToBerkeley();
+        }
+        const walletProvider = (window as any).zkshield.walletProvider;
+        if (!walletProvider.hasWallet()) {
           setState({ ...state, hasWallet: false });
           return;
         }
 
-        const publicKeyBase58: string = (await mina.requestAccounts())[0];
+        const publicKeyBase58: string = (await walletProvider.requestAccounts())[0];
         const publicKey = PublicKey.fromBase58(publicKeyBase58);
 
         console.log(`Using key:${publicKey.toBase58()}`);
@@ -67,7 +73,8 @@ const SendTransaction = () => {
         const res = await zkappWorkerClient.fetchAccount({
           publicKey: publicKey!
         });
-        const accountExists = res.error == null;
+
+        const accountExists = networkChoosen == 'local' ? true : res.error == null;
 
         await zkappWorkerClient.loadContract();
 
@@ -108,7 +115,7 @@ const SendTransaction = () => {
   useEffect(() => {
     (async () => {
       if (state.hasBeenSetup && !state.accountExists) {
-        for (;;) {
+        for (; ;) {
           setDisplayText('Checking if fee payer account exists...');
           console.log('Checking if fee payer account exists...');
           const res = await state.zkappWorkerClient!.fetchAccount({
@@ -154,16 +161,16 @@ const SendTransaction = () => {
     const hash = result.transactionHash;
 
 
-    if(result.succeded) {
-      
-    const transactionLink = `https://minascan.io/berkeley/tx/${hash}?type=zk-tx`;
-    //const transactionLink = `https://berkeley.minaexplorer.com/transaction/${hash}`;
-    console.log(`View transaction at ${transactionLink}`);
+    if (result.succeded) {
 
-    setTransactionLink(transactionLink);
-    setDisplayText(transactionLink);
+      const transactionLink = `https://minascan.io/berkeley/tx/${hash}?type=zk-tx`;
+      //const transactionLink = `https://berkeley.minaexplorer.com/transaction/${hash}`;
+      console.log(`View transaction at ${transactionLink}`);
+
+      setTransactionLink(transactionLink);
+      setDisplayText(transactionLink);
     } else {
-    setDisplayText(`Transaction failed. Reason: ${result.errorMessage}`);
+      setDisplayText(`Transaction failed. Reason: ${result.errorMessage}`);
 
     }
 
@@ -191,12 +198,12 @@ const SendTransaction = () => {
     setDisplayText('Signing message...');
     const content = (window as any).document.getElementById("signMessageInput").value;
     const result = await (window as any).zkshield.walletProvider.signMessage(content);
-    
-    if(result.succeded) {
+
+    if (result.succeded) {
       console.log("Sign message succeded", result);
       setDisplayText(`Sign message succeded: ${JSON.stringify(result)}`);
     } else {
-      
+
       console.log("Sign message failed", result);
       setDisplayText(`Sign message failed: ${JSON.stringify(result)}`);
     }
@@ -268,22 +275,22 @@ const SendTransaction = () => {
         <p>
           <input id="signMessageInput" className={styles.signMessageInput} type='text' placeholder='Enter a messsage' />
           <button
-          className={styles.card}
-          onClick={onSignMessage}
-        >Sign message</button>
+            className={styles.card}
+            onClick={onSignMessage}
+          >Sign message</button>
         </p>
       </div>
     );
   }
 
   return (
-      <div className={styles.main} style={{ padding: 0 }}>
-        <div className={styles.center} style={{ padding: 0 }}>
-          {setup}
-          {accountDoesNotExist}
-          {mainContent}
-        </div>
+    <div className={styles.main} style={{ padding: 0 }}>
+      <div className={styles.center} style={{ padding: 0 }}>
+        {setup}
+        {accountDoesNotExist}
+        {mainContent}
       </div>
+    </div>
   );
 }
 

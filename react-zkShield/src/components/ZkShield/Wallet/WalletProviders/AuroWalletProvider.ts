@@ -15,6 +15,10 @@ export class AuroWalletProvider implements IWalletProvider {
         this.mina = mina;
         console.log("AuroWalletProvider.constructor", mina);
     }
+
+    async requestAccounts(): Promise<string[]> {
+        return await this.mina.requestAccounts();
+    }
    
     async selectChain(chainID: string): Promise<ChainSelectedResult> {
         try {

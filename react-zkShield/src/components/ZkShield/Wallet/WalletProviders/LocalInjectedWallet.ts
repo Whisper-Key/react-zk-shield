@@ -26,6 +26,10 @@ export class LocalInjectedWallet implements IWalletProvider {
         this.localAccount = PrivateKey.fromBase58(localAccount);
     }
 
+    async requestAccounts(): Promise<string[]> {
+        return Promise.resolve([this.localAccount.toPublicKey().toBase58()]);
+    }
+
     hasWallet(): boolean {
         console.log("LocalInjectedWallet.hasWallet", this.walletAvailable);
         return this.walletAvailable;

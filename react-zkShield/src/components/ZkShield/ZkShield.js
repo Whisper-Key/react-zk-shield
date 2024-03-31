@@ -193,6 +193,7 @@ const ZkShield = ({
 
   const networkSelected = async (network) => {
     console.log("network selected in ZK Shield", network);
+    window.zkshield.network = network;
     setState({ ...state, networkSelected: true, network: network });
 
     if (network == "local" && injectedWalletRef.current) {

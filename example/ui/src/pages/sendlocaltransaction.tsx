@@ -25,43 +25,44 @@ export default function Home() {
   zkApp: Add,
   proofsEnabled: boolean = false;
 
-  useEffect(() => {
+//   useEffect(() => {
 
-    (async () => {
+//     (async () => {
         
-  const Local = Mina.LocalBlockchain({ proofsEnabled });
-    Mina.setActiveInstance(Local);
-    ({ privateKey: deployerKey, publicKey: deployerAccount } =
-      Local.testAccounts[0]);
-    ({ privateKey: senderKey, publicKey: senderAccount } =
-      Local.testAccounts[1]);
-    zkAppPrivateKey = PrivateKey.random();
-    zkAppAddress = zkAppPrivateKey.toPublicKey();
-    zkApp = new Add(zkAppAddress);
+//   const Local = Mina.LocalBlockchain({ proofsEnabled });
+//     Mina.setActiveInstance(Local);
+//     ({ privateKey: deployerKey, publicKey: deployerAccount } =
+//       Local.testAccounts[0]);
+//     ({ privateKey: senderKey, publicKey: senderAccount } =
+//       Local.testAccounts[1]);
+//     zkAppPrivateKey = PrivateKey.random();
+//     zkAppAddress = zkAppPrivateKey.toPublicKey();
+//     zkApp = new Add(zkAppAddress);
 
-    console.log("transaction creating");
-    const txn = await Mina.transaction(deployerAccount, () => {
-      AccountUpdate.fundNewAccount(deployerAccount);
-      zkApp.deploy();
-    });
-    console.log("transaction created");
+//     console.log("transaction creating");
+//     const txn = await Mina.transaction(deployerAccount, () => {
+//       AccountUpdate.fundNewAccount(deployerAccount);
+//       zkApp.deploy();
+//     });
+//     console.log("transaction created");
 
-    await txn.prove();
-    console.log("transaction proved");
+//     await txn.prove();
+//     console.log("transaction proved");
 
-    // this tx needs .sign(), because `deploy()` adds an account update that requires signature authorization
-    await txn.sign([deployerKey, zkAppPrivateKey]).send();
-    console.log("transaction signed and sent");
+//     // this tx needs .sign(), because `deploy()` adds an account update that requires signature authorization
+//     await txn.sign([deployerKey, zkAppPrivateKey]).send();
+//     console.log("transaction signed and sent");
     
 
-    })();
-}, []);
+//     })();
+// }, []);
   return (
     <>
       <div id="zkshield-connect">
       <GradientBG>
       <UnshieldedHeader />
 
+      <h1>Browser hangs on local blockchain deploy contract, after compile step.</h1>
       <ZkShield  mainContainerClassName={styles.main} 
                 innerContainerClassName={styles.center} 
                 selectNetworkClassName={styles.selectNetworkContainer}
@@ -72,8 +73,7 @@ export default function Home() {
                 >
 
 <h1>Content</h1>
-        {/* <SendTransaction /> */}
-            
+        <SendTransaction />
         </ZkShield>
       </GradientBG>
       </div>

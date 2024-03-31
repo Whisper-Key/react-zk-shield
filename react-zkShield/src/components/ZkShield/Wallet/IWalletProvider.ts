@@ -13,4 +13,5 @@ export interface IWalletProvider {
     sendZkTransaction(transaction: any, fee: number, memo: string) : Promise<WalletTransactionResult>;
     signMessage(message: string) : Promise<SignedMessageResult>;
     selectChain(chainID: string): Promise<ChainSelectedResult>;
+    requestAccounts(): Promise<string[]>;
 }

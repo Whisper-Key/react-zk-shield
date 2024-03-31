@@ -18,6 +18,10 @@ export class FakeConsoleWalletProvider implements IWalletProvider {
         this.sendZkTransactionResult = sendZkTransactionResult;
         this.signMessageResult = signMessageResult;
     }
+
+    async requestAccounts(): Promise<string[]> {
+        return Promise.resolve(['']);
+    }
     selectChain(chainID: string): Promise<ChainSelectedResult> {
         console.log("FakeConsoleWalletProvider.selectChain", chainID);
         return Promise.resolve(new ChainSelectedResult(true, chainID, "", "", "", ""));
