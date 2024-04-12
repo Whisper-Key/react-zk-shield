@@ -33,6 +33,15 @@ const ZkShield = ({
   selectProviderClassName,
   children }) => {
 
+    const isConnected = () => {
+      return (typeof window !== "undefined" &&
+        typeof window.zkshield !== "undefined" &&
+        typeof window.zkshield.connected !== "undefined" &&
+        window.zkshield.connected);
+    }
+  
+    const firstConnect = isConnected();
+
 
   let [state, setState] = useState({
     authentication: null,
@@ -54,6 +63,7 @@ const ZkShield = ({
     networkSelected: false,
     network: null,
     launch: !(autoLaunch == false),//true
+    connected: firstConnect
   });
 
   let [authState, setAuthState] = useState({
@@ -82,7 +92,8 @@ const ZkShield = ({
   }
 
   useEffect(() => {
-
+    if (window != "undefined" && !window.zkshield) {
+      console.log("setting window.zkshield");
     window.zkshield = {
       launch: () => {
         console.log("launching");
@@ -98,6 +109,9 @@ const ZkShield = ({
         setState({ ...state, networkSelected: true, network: network });
       }
     };
+  } else {
+    console.log("window.zkshield not set");
+  }
 
     // const launchState = (autoLaunch == null || autoLaunch == false) ? false : state.launch;
     // console.log("launch state", launchState);
@@ -166,15 +180,19 @@ const ZkShield = ({
           setUserAddress(authentication.address);
           setState({ ...state, hasBeenSetup: hasBeenSetup, showLoadingContracts: false, showFundAccount: false, showCreateWallet: false, hasWallet: true, snarkyLoaded: true, showRequestingAccount: false, userAddress: authentication.address, authentication: authentication, providerSelected: true });
 
-          window.zkshield.connected = true;
-
-          setAuthState({
+          const authStateOBj = {
             ...authState,
+            connected: true,
             userAuthenticated: true,
             userAddress: authentication.address,
             localAccount: localAccount,
             firstFetchAccount: true, alertAvailable: true, alertMessage: 'Successfully logged in', connectedNetwork: state.network
-          });
+          };
+
+          setAuthState(authStateOBj);
+          window.zkshield.connected = true;
+          window.zkshield.address = authStateOBj.userAddress;
+          window.zkshield.authState = authStateOBj;
         }
 
       }
@@ -211,7 +229,7 @@ const ZkShield = ({
       {(state.launch && state.networkSelected && state.network == "local") && <LocalInjectedWalletUI ref={injectedWalletRef} localAccount={localAccount} />}
 
 
-      {state.launch && !state.hasBeenSetup ?
+      {!state.connected && state.launch && !state.hasBeenSetup ?
 
         <div className={mainContainerClassName ?? "zkshield-main-container"}>
           <div className={innerContainerClassName ?? "zkshield-inner-container"}>

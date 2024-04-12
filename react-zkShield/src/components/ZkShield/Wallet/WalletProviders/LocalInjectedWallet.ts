@@ -43,8 +43,9 @@ export class LocalInjectedWallet implements IWalletProvider {
                 console.log("LocalInjectedWallet.connect", connected);
 
                 if (connected) {
+                    const localPublicAddress = this.localAccount.toPublicKey().toBase58();
                     this.connectedZkApps.push(this.environment.location.origin);
-                    return Promise.resolve(new WalletConnectResult(true, "", "", "", ""));
+                    return Promise.resolve(new WalletConnectResult(true, localPublicAddress, "", "", ""));
 
                 } else {
                     return Promise.resolve(new WalletConnectResult(false, "", "", "", ""));

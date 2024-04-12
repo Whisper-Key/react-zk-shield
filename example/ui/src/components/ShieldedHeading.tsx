@@ -1,14 +1,10 @@
 // midway iteration
 import { useContext, useRef, useState } from "react";
 import { Bool, CircuitString, Field, PublicKey, Struct } from 'o1js';
-// import { AuthContext } from "./Shield/AuthPage";
-import { AuthContext } from "zkshield";
 import React from 'react';
 import Router from 'next/router';
 
 const ShieldedHeading = () => {
-  const [authState, setAuthState] = useContext(AuthContext);
-  console.log("authState", authState);
   const shortenAddress = (address: string) =>  {
     
     const prefix = address.slice(0, 6);
@@ -19,11 +15,11 @@ const ShieldedHeading = () => {
   return (
     <>
     <div style={{textAlign: "center", marginTop: "20px"}}>
-    {authState.userAuthenticated && <>
-      <h1> Connected as {shortenAddress(authState.userAddress)} </h1>
-      <h3>on network - {authState.connectedNetwork} </h3>
+    {(window as any)!.zkshield!.connected! && <>
+      <h1> Connected as {shortenAddress((window as any)!.zkshield!.address)} </h1>
+      <h3>on network - {(window as any)!.zkshield!.authState.network} </h3>
       </> }
-      <h1>{!authState.userAuthenticated && "Not connected to a wallet!" }</h1>
+      <h1>{!(window as any)!.zkshield!.connected! && "Not connected to a wallet!" }</h1>
     </div>
     </>  );
 }

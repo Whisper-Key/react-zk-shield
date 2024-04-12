@@ -1,26 +1,23 @@
 // midway iteration
 import { useContext, useRef, useState } from "react";
 import { Bool, CircuitString, Field, PublicKey, Struct } from 'o1js';
-// import { AuthContext } from "./Shield/AuthPage";
-import { AuthContext } from "zkshield";
 import React from 'react';
 import Router from 'next/router';
 
 const SignMessageComponent = () => {
-  const [authState, setAuthState] = useContext(AuthContext);
-  console.log("authState", authState);
   const signMessage = async () =>  {
     const json = document.getElementById("json") as HTMLInputElement;
+    console.log("json", json.value);  
     const result = await (window as any).zkshield.walletProvider.signMessage(json.value);
     const resultDiv = document.getElementById("signResult");
-    resultDiv!.innerHTML = JSON.stringify(result.data.toJSON());
+    resultDiv!.innerHTML = JSON.stringify(result.data);
     console.log("json", json.value);
   }
 
   return (
     <>
     <div style={{textAlign: "center", marginTop: "20px"}}>
-    {authState.userAuthenticated && <>
+    {(window as any)!.zkshield!.connected! && <> 
       <h1> Sign a message </h1>
       
       <div>
@@ -30,7 +27,7 @@ const SignMessageComponent = () => {
         <div id="signResult"></div>
         </div>
       </> }
-      <h1>{!authState.userAuthenticated && "Not connected to a wallet!" }</h1>
+      <h1>{!(window as any)!.zkshield!.connected! && "Not connected to a wallet!" }</h1>
     </div>
     </>  );
 }
